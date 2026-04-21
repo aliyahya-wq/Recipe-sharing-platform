@@ -1,0 +1,154 @@
+ملخص جداول نموذج البيانات في المشروع
+
+1. accounts/models.py
+--------------------
+User (مستخدم)
+- يرث من AbstractUser و SoftDeleteMixin
+- حقول إضافية:
+  - bio: TextField (نبذة عن المستخدم)
+  - profile_picture: ImageField (الصورة الشخصية)
+  - facebook_link: URLField
+  - instagram_link: URLField
+  - twitter_link: URLField
+  - phone_number: CharField (رقم الهاتف)
+- العلاقات:
+  - Recipe.author: علاقة ForeignKey مع User
+  - Comment.user: علاقة ForeignKey مع User
+  - Rating.user: علاقة ForeignKey مع User
+  - Favorite.user: علاقة ForeignKey مع User
+  - Like.user: علاقة ForeignKey مع User
+  - Follow.follower و Follow.following: علاقة ForeignKey ذاتية مع User
+- السلوكيات:
+  - الحذف الناعم عبر الحقول is_deleted و deleted_at من SoftDeleteMixin
+
+
+----------------------
+SoftDeleteMixin (abstract)
+- is_deleted: BooleanField (افتراضي False)
+- deleted_at: DateTimeField (null=True، blank=True)
+- objects: SoftDeleteManager => يعرض فقط السجلات غير المحذوفة
+- all_objects: Manager => يعرض كل السجلات
+- طرق:
+  - delete(): يحول السجل إلى محذوف ناعماً بدلاً من الحذف الفعلي
+  - restore(): يستعيد السجل
+  - hard_delete(): حذف نهائي من قاعدة البيانات
+
+
+----------------------
+UserActivity (نشاط المستخدم)
+- user: ForeignKey إلى AUTH_USER_MODEL، on_delete=models.CASCADE
+- action: CharField مع خيارات ACTION_CHOICES
+- details: TextField
+- ip_address: GenericIPAddressField (null=True، blank=True)
+- timestamp: DateTimeField(auto_now_add=True)
+- قيود:
+  - ordering = ['-timestamp']
+
+Visit (زيارات الموقع)
+- ip_address: GenericIPAddressField
+- country: CharField(max_length=100، default='Unknown')
+- country_code: CharField(max_length=5، default='UN')
+- path: CharField(max_length=255)
+- timestamp: DateTimeField(auto_now_add=True)
+- user_agent: TextField (null=True، blank=True)
+- قيود:
+  - ordering = ['-timestamp']
+
+
+
+
+2. recipes/models.py
+--------------------
+Category (فئة)
+- يرث من SoftDeleteMixin
+- name: CharField(max_length=100)
+- icon: ImageField(upload_to='category_icons/', null=True، blank=True)
+- علاقات:
+  - Recipe.category: ForeignKey إلى Category مع on_delete=models.SET_NULL و null=True
+
+
+
+Recipe (وصفة)
+- يرث من SoftDeleteMixin
+- author: ForeignKey إلى AUTH_USER_MODEL، on_delete=models.CASCADE، related_name='recipes'
+- title: CharField(max_length=200)
+- description: TextField
+- image: ImageField(upload_to='recipe_images/')
+- category: ForeignKey إلى Category، on_delete=models.SET_NULL، null=True، related_name='recipes'
+- prep_time: PositiveIntegerField
+- cook_time: PositiveIntegerField
+- servings: PositiveIntegerField
+- difficulty: CharField(max_length=10، choices=DIFFICULTY_CHOICES، default='medium')
+- created_at: DateTimeField(auto_now_add=True)
+- updated_at: DateTimeField(auto_now=True)
+- قيود:
+  - ordering = ['-created_at']
+- علاقات عكسية:
+  - Ingredient.recipe
+  - Step.recipe
+  - Comment.recipe
+  - Rating.recipe
+  - Favorite.recipe
+  - Like.recipe
+
+
+
+Ingredient (مكون)
+- recipe: ForeignKey إلى Recipe، on_delete=models.CASCADE، related_name='ingredients'
+- name: CharField(max_length=100)
+- quantity: CharField(max_length=50)
+
+
+
+Step (خطوة)
+- recipe: ForeignKey إلى Recipe، on_delete=models.CASCADE، related_name='steps'
+- order: PositiveIntegerField
+- description: TextField
+- image: ImageField(upload_to='step_images/', null=True، blank=True)
+- قيود:
+  - ordering = ['order']
+
+
+
+
+-------------------
+BaseModel (abstract)
+- created_at: DateTimeField(auto_now_add=True)
+
+Comment (تعليق)
+- يرث من BaseModel و SoftDeleteMixin
+- user: ForeignKey إلى AUTH_USER_MODEL، on_delete=models.CASCADE
+- recipe: ForeignKey إلى Recipe، on_delete=models.CASCADE، related_name='comments'
+- text: TextField
+- parent: ForeignKey إلى self، on_delete=models.CASCADE، null=True، blank=True، related_name='replies'
+- قيود:
+  - ordering = ['-created_at']
+
+Rating (تقييم)
+- يرث من BaseModel
+- user: ForeignKey إلى AUTH_USER_MODEL، on_delete=models.CASCADE
+- recipe: ForeignKey إلى Recipe، on_delete=models.CASCADE، related_name='ratings'
+- score: PositiveIntegerField مع choices من 1 إلى 5
+- قيود:
+  - unique_together = ('user', 'recipe')   # يمنع التقييم المكرر لنفس الوصفة من نفس المستخدم
+
+Favorite (مفضلة)
+- يرث من BaseModel
+- user: ForeignKey إلى AUTH_USER_MODEL، on_delete=models.CASCADE، related_name='favorites'
+- recipe: ForeignKey إلى Recipe، on_delete=models.CASCADE، related_name='favorited_by'
+- قيود:
+  - unique_together = ('user', 'recipe')
+
+Like (إعجاب)
+- يرث من BaseModel
+- user: ForeignKey إلى AUTH_USER_MODEL، on_delete=models.CASCADE، related_name='likes'
+- recipe: ForeignKey إلى Recipe، on_delete=models.CASCADE، related_name='likes'
+- قيود:
+  - unique_together = ('user', 'recipe')
+
+Follow (متابعة)
+- يرث من BaseModel
+- follower: ForeignKey إلى AUTH_USER_MODEL، on_delete=models.CASCADE، related_name='following'
+- following: ForeignKey إلى AUTH_USER_MODEL، on_delete=models.CASCADE، related_name='followers'
+- قيود:
+  - unique_together = ('follower', 'following')
