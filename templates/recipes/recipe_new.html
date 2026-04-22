@@ -1,0 +1,728 @@
+{% extends 'baes.html' %}
+
+{% block title %}{{ recipe.name }} - منصة الأكل{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  .recipe-page {
+    font-family: 'Cairo', sans-serif;
+    background: #0f0f13;
+    min-height: 100vh;
+    color: #e8e0d5;
+    direction: rtl;
+  }
+
+  /* ===== HERO ===== */
+  .recipe-hero {
+    position: relative;
+    background: linear-gradient(135deg, #1a0a00 0%, #2d1200 40%, #1a0814 100%);
+    padding: 60px 24px 80px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .recipe-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 0%, rgba(255, 140, 0, .18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 80% 80%, rgba(180, 0, 80, .12) 0%, transparent 60%);
+  }
+
+  /* ===== HERO IMAGE ===== */
+  .hero-image-wrap {
+    max-width: 860px;
+    margin: 0 auto -40px;
+    padding: 0 24px;
+    position: relative;
+    z-index: 3;
+  }
+
+  .hero-image-wrap img {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+    border-radius: 22px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
+    border: 2px solid #2a2535;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #ff8c00, #e6005a);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 700;
+    padding: 5px 18px;
+    border-radius: 30px;
+    letter-spacing: .5px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  .recipe-hero h1 {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, #ffb347 60%, #ff8c00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .recipe-hero .summary {
+    max-width: 680px;
+    margin: 0 auto;
+    color: #c8b89a;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    position: relative;
+  }
+
+  /* ===== META STRIP ===== */
+  .meta-strip {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 28px 24px;
+    background: #16141a;
+    border-bottom: 1px solid #2a2530;
+  }
+
+  .meta-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #1e1b24;
+    border: 1px solid #2e2b38;
+    border-radius: 14px;
+    padding: 12px 16px;
+    min-width: 120px;
+    transition: border-color .3s, transform .3s;
+  }
+
+  .meta-card:hover {
+    border-color: #ff8c00;
+    transform: translateY(-3px);
+  }
+
+  .meta-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .meta-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .meta-label {
+    font-size: .72rem;
+    color: #7a7085;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .meta-value {
+    font-size: .95rem;
+    font-weight: 700;
+    color: #ffe0a0;
+  }
+
+  /* ===== MAIN LAYOUT ===== */
+  .recipe-body {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 32px;
+  }
+
+  @media (max-width: 768px) {
+    .recipe-body {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ===== SECTION CARDS ===== */
+  .section-card {
+    background: #1a1720;
+    border: 1px solid #2a2535;
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 24px;
+    transition: border-color .3s;
+  }
+
+  .section-card:hover {
+    border-color: #3d3550;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #2a2535;
+  }
+
+  .section-title .icon-circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .orange-circle {
+    background: linear-gradient(135deg, #ff8c00, #ff5500);
+  }
+
+  .pink-circle {
+    background: linear-gradient(135deg, #e6005a, #a0004a);
+  }
+
+  .green-circle {
+    background: linear-gradient(135deg, #00c87a, #008c5a);
+  }
+
+  .blue-circle {
+    background: linear-gradient(135deg, #007aff, #0044cc);
+  }
+
+  /* ===== INGREDIENTS TABLE ===== */
+  .ingredients-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .95rem;
+  }
+
+  .ingredients-table thead th {
+    background: linear-gradient(90deg, #ff8c00, #e6005a);
+    color: #fff;
+    padding: 12px 16px;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .ingredients-table thead th:first-child {
+    border-radius: 0 10px 0 0;
+  }
+
+  .ingredients-table thead th:last-child {
+    border-radius: 10px 0 0 0;
+  }
+
+  .ingredients-table tbody tr {
+    border-bottom: 1px solid #2a2535;
+    transition: background .2s;
+  }
+
+  .ingredients-table tbody tr:hover {
+    background: #221f2a;
+  }
+
+  .ingredients-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .ingredients-table td {
+    padding: 11px 16px;
+    color: #d0c4b0;
+  }
+
+  .ingredients-table td:first-child {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .ingredient-qty {
+    display: inline-block;
+    background: rgba(255, 140, 0, .15);
+    color: #ffb347;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: .87rem;
+  }
+
+  /* ===== STEPS ===== */
+  .steps-list {
+    list-style: none;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding: 16px;
+    background: #201d28;
+    border-radius: 14px;
+    border-right: 3px solid #ff8c00;
+    transition: transform .25s;
+  }
+
+  .step-item:hover {
+    transform: translateX(-4px);
+  }
+
+  .step-num {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff8c00, #e6005a);
+    color: #fff;
+    font-weight: 900;
+    font-size: .9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-text {
+    color: #c8b89a;
+    line-height: 1.7;
+    padding-top: 4px;
+  }
+
+  /* ===== SIDEBAR INGREDIENTS ===== */
+  .sidebar-ingredients {
+    background: #1a1720;
+    border: 1px solid #2a2535;
+    border-radius: 20px;
+    padding: 24px;
+    position: sticky;
+    top: 24px;
+  }
+
+  .sidebar-ingredients h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ingredient-pill {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #201d28;
+    margin-bottom: 8px;
+    border: 1px solid transparent;
+    transition: border-color .2s, transform .2s;
+  }
+
+  .ingredient-pill:hover {
+    border-color: #ff8c00;
+    transform: translateX(-3px);
+  }
+
+  .pill-name {
+    color: #e8e0d5;
+    font-weight: 600;
+    font-size: .9rem;
+  }
+
+  .pill-qty {
+    color: #ffb347;
+    font-size: .82rem;
+    font-weight: 700;
+  }
+
+  /* ===== COMMENTS ===== */
+  .comment-box {
+    background: #1e1b26;
+    border: 1px solid #2e2b3a;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: border-color .3s;
+  }
+
+  .comment-box:hover {
+    border-color: #4a4060;
+  }
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff8c00, #e6005a);
+    color: #fff;
+    font-weight: 900;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .comment-user {
+    font-weight: 700;
+    color: #fff;
+    font-size: .95rem;
+  }
+
+  .comment-date {
+    font-size: .78rem;
+    color: #7a7085;
+  }
+
+  .comment-text {
+    color: #b8a898;
+    line-height: 1.7;
+    font-size: .95rem;
+  }
+
+  .replies-list {
+    margin-top: 14px;
+    padding-right: 20px;
+    border-right: 2px solid #2e2b3a;
+  }
+
+  .reply-box {
+    background: #161320;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+
+  .reply-box .avatar {
+    width: 34px;
+    height: 34px;
+    font-size: .82rem;
+    background: linear-gradient(135deg, #007aff, #a000e6);
+  }
+
+  /* ===== COMMENT FORM ===== */
+  .comment-form textarea {
+    width: 100%;
+    background: #201d28;
+    border: 1px solid #3a3545;
+    border-radius: 12px;
+    color: #e8e0d5;
+    font-family: 'Cairo', sans-serif;
+    font-size: .95rem;
+    padding: 14px 16px;
+    resize: vertical;
+    min-height: 100px;
+    outline: none;
+    transition: border-color .3s;
+  }
+
+  .comment-form textarea:focus {
+    border-color: #ff8c00;
+  }
+
+  .comment-form textarea::placeholder {
+    color: #5a5068;
+  }
+
+  .btn-submit {
+    margin-top: 12px;
+    background: linear-gradient(90deg, #ff8c00, #e6005a);
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 30px;
+    font-family: 'Cairo', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .3s, transform .2s;
+  }
+
+  .btn-submit:hover {
+    opacity: .88;
+    transform: translateY(-2px);
+  }
+</style>
+
+<div class="recipe-page">
+
+  <!-- HERO -->
+  <div class="recipe-hero">
+    <div style="margin-bottom: 10px;">
+      <span class="hero-badge">🍽️ {{ recipe.category }}</span>
+    </div>
+    <h1>{{ recipe.name }}</h1>
+    <p class="summary">{{ recipe.summary }}</p>
+
+    <!-- Star Rating -->
+    <style>
+      .stars-container {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        direction: ltr;
+        margin-top: 15px;
+        position: relative;
+        z-index: 20;
+      }
+
+      .star-label {
+        font-size: 2.5rem;
+        cursor: pointer;
+        color: #3a3545;
+        transition: transform 0.2s, color 0.2s;
+        display: inline-block;
+        line-height: 1;
+      }
+
+      .star-label:hover {
+        transform: scale(1.2);
+        color: #ffb347 !important;
+      }
+
+      /* Hovering a star also colors stars to its left (since it's LTR) */
+      .star-label:hover~.star-label {
+        color: #ffb347 !important;
+      }
+
+      .star-input:checked~.star-label {
+        color: #ffb347;
+      }
+    </style>
+    <div class="rating-stars" style="position: relative; z-index: 20;">
+      <p style="color: #c8b89a; font-size: 0.9rem; margin-bottom: 5px;">تقييمك لهذه الوصفة:</p>
+      <form action="{% url 'rate_recipe' recipe.id %}" method="POST" id="rating-form">
+        {% csrf_token %}
+        <div class="stars-container">
+          {% with rating=recipe.user_rating|default:0|add:"0" %}
+          <input type="radio" name="rating" value="5" id="star5" class="star-input" style="position: absolute; opacity: 0;" {% if rating == 5 %}checked{% endif %} onchange="this.form.submit()"> <!-- ضروري ترك مسافات حول == -->
+          <label for="star5" class="star-label" style="{% if rating >= 5 %}color: #ffb347;{% endif %}">★</label>
+
+          <input type="radio" name="rating" value="4" id="star4" class="star-input" style="position: absolute; opacity: 0;" {% if rating == 4 %}checked{% endif %} onchange="this.form.submit()"> <!-- ضروري ترك مسافات حول == -->
+          <label for="star4" class="star-label" style="{% if rating >= 4 %}color: #ffb347;{% endif %}">★</label>
+
+          <input type="radio" name="rating" value="3" id="star3" class="star-input" style="position: absolute; opacity: 0;" {% if rating == 3 %}checked{% endif %} onchange="this.form.submit()"> <!-- ضروري ترك مسافات حول == -->
+          <label for="star3" class="star-label" style="{% if rating >= 3 %}color: #ffb347;{% endif %}">★</label>
+
+          <input type="radio" name="rating" value="2" id="star2" class="star-input" style="display: none;" {% if rating == 2 %}checked{% endif %} onchange="this.form.submit()"> <!-- ضروري ترك مسافات حول == -->
+          <label for="star2" class="star-label" style="{% if rating >= 2 %}color: #ffb347;{% endif %}">★</label>
+
+          <input type="radio" name="rating" value="1" id="star1" class="star-input" style="display: none;" {% if rating == 1 %}checked{% endif %} onchange="this.form.submit()"> <!-- ضروري ترك مسافات حول == -->
+          <label for="star1" class="star-label" style="{% if rating >= 1 %}color: #ffb347;{% endif %}">★</label>
+          {% endwith %}
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- HERO IMAGE (if available) -->
+  {% if recipe.image %}
+  <div class="hero-image-wrap">
+    <img src="{{ recipe.image }}" alt="{{ recipe.name }}">
+  </div>
+  {% endif %}
+
+  <!-- META STRIP -->
+  <div class="meta-strip">
+    <div class="meta-card">
+      <span class="meta-icon">⏱️</span>
+      <div class="meta-info">
+        <span class="meta-label">وقت التحضير</span>
+        <span class="meta-value">{{ recipe.prep_time }}</span>
+      </div>
+    </div>
+    <div class="meta-card">
+      <span class="meta-icon">🔥</span>
+      <div class="meta-info">
+        <span class="meta-label">وقت الطهي</span>
+        <span class="meta-value">{{ recipe.cooking_time }}</span>
+      </div>
+    </div>
+    <div class="meta-card">
+      <span class="meta-icon">👥</span>
+      <div class="meta-info">
+        <span class="meta-label">عدد الأشخاص</span>
+        <span class="meta-value">{{ recipe.servings }}</span>
+      </div>
+    </div>
+    <div class="meta-card">
+      <span class="meta-icon">📊</span>
+      <div class="meta-info">
+        <span class="meta-label">الصعوبة</span>
+        <span class="meta-value">{{ recipe.difficulty }}</span>
+      </div>
+    </div>
+    <!-- Favorite Button as Card -->
+    <form action="{% url 'toggle_favorite' recipe.id %}" method="POST" style="display: contents;">
+      {% csrf_token %}
+      <button type="submit" class="meta-card"
+        style="background: #1e1b24; border: 1px solid #2e2b38; cursor: pointer; text-align: right; transition: all 0.3s; flex: 1; max-width: 180px; font-family: 'Cairo';">
+        <span class="meta-icon" style="font-size: 1.5rem;">{% if recipe.is_favorite %}❤️{% else %}🤍{% endif %}</span>
+        <div class="meta-info">
+          <span class="meta-label">المفضلة</span>
+          <span class="meta-value" style="color: {% if recipe.is_favorite %}#ff4757{% else %}#ffe0a0{% endif %}; font-size: 0.85rem;">
+            {% if recipe.is_favorite %}تم الحفظ{% else %}إضافة{% endif %}
+          </span>
+        </div>
+      </button>
+    </form>
+  </div>
+
+  <!-- BODY GRID -->
+  <div class="recipe-body">
+
+    <!-- MAIN COLUMN -->
+    <div>
+
+      <!-- INGREDIENTS TABLE (optional) -->
+      {% if recipe.show_table %}
+      <div class="section-card">
+        <div class="section-title">
+          <span class="icon-circle orange-circle">🧂</span>
+          المكونات
+        </div>
+        <table class="ingredients-table">
+          <thead>
+            <tr>
+              <th>اسم المكون</th>
+              <th>المقدار</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ing in recipe.ingredients %}
+            <tr>
+              <td>{{ ing.name }}</td>
+              <td><span class="ingredient-qty">{{ ing.amount }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      <!-- STEPS -->
+      <div class="section-card">
+        <div class="section-title">
+          <span class="icon-circle pink-circle">📋</span>
+          شرح الوصفة
+        </div>
+        <ul class="steps-list">
+          {% for step in recipe.instructions %}
+          <li class="step-item">
+            <span class="step-num">{{ forloop.counter }}</span>
+            <p class="step-text">{{ step }}</p>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- COMMENTS -->
+      <div class="section-card">
+        <div class="section-title">
+          <span class="icon-circle blue-circle">💬</span>
+          التعليقات ({{ recipe.comments|length }})
+        </div>
+
+        {% for comment in recipe.comments %}
+        <div class="comment-box">
+          <div class="comment-header">
+            <div class="avatar">{{ comment.avatar }}</div>
+            <div>
+              <div class="comment-user">{{ comment.user }}</div>
+              <div class="comment-date">{{ comment.date }}</div>
+            </div>
+          </div>
+          <p class="comment-text">{{ comment.text }}</p>
+
+          <button onclick="document.getElementById('reply-form-{{ forloop.counter0 }}').style.display='block'"
+            style="background:none; border:none; color:#ff8c00; font-size:0.85rem; cursor:pointer; margin-top:8px; font-family:'Cairo';">رد
+            على التعليق</button>
+
+          <div id="reply-form-{{ forloop.counter0 }}" style="display:none; margin-top:10px;">
+            <form action="{% url 'add_reply' recipe.id forloop.counter0 %}" method="POST">
+              {% csrf_token %}
+              <textarea name="reply" placeholder="اكتب ردك هنا..."
+                style="width:100%; background:#161320; border:1px solid #3a3545; border-radius:8px; color:#e8e0d5; padding:10px; font-family:'Cairo'; font-size:0.9rem; min-height:60px;"></textarea>
+              <button type="submit" class="btn-submit"
+                style="padding: 6px 20px; font-size: 0.85rem; margin-top: 5px;">إرسال الرد</button>
+            </form>
+          </div>
+
+          {% if comment.replies %}
+          <div class="replies-list">
+            {% for reply in comment.replies %}
+            <div class="reply-box">
+              <div class="comment-header">
+                <div class="avatar">{{ reply.avatar }}</div>
+                <div>
+                  <div class="comment-user">{{ reply.user }}</div>
+                  <div class="comment-date">{{ reply.date }}</div>
+                </div>
+              </div>
+              <p class="comment-text">{{ reply.text }}</p>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Comment Form -->
+        <div class="comment-form" style="margin-top:24px;">
+          <div class="section-title" style="border-bottom:none; margin-bottom:14px;">
+            <span class="icon-circle green-circle">✏️</span>
+            أضف تعليقاً
+          </div>
+          <form action="{% url 'add_comment' recipe.id %}" method="POST">
+            {% csrf_token %}
+            <textarea name="comment" placeholder="اكتب تعليقك هنا..." required></textarea>
+            <button type="submit" class="btn-submit">إرسال التعليق</button>
+          </form>
+        </div>
+      </div>
+
+    </div><!-- end main col -->
+
+    <!-- SIDEBAR -->
+    <div>
+      <div class="sidebar-ingredients">
+        <h3>🛒 قائمة المكونات</h3>
+        {% for ing in recipe.ingredients %}
+        <div class="ingredient-pill">
+          <span class="pill-name">{{ ing.name }}</span>
+          <span class="pill-qty">{{ ing.amount }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div><!-- end grid -->
+
+</div><!-- end recipe-page -->
+{% endblock %}

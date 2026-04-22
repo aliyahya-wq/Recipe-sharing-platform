@@ -1,8 +1,273 @@
 {% extends 'baes.html' %}
-
-{% block title %}الرئيسية - منصة الأكل{% endblock %}
+{% block title %}منصة مشاركة الوصفات{% endblock %}
 
 {% block content %}
-<h1>مرحباً بك في منصة الأكل</h1>
-<p>هذه هي الصفحة الرئيسية لمنصتنا.</p>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .home-page {
+    font-family: 'Cairo', sans-serif;
+    background: #08060f;
+    min-height: 100vh;
+    direction: rtl;
+    color: #e8e0d5;
+  }
+
+  /* ── HERO ── */
+  .home-hero {
+    background: linear-gradient(135deg, #0d0020 0%, #0a001a 40%, #001525 100%);
+    padding: 80px 24px 90px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 90% 70% at 50% -5%, rgba(100,0,255,.25) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 50% at 85% 85%, rgba(0,200,255,.12) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 10% 80%, rgba(255,80,0,.1) 0%, transparent 55%);
+  }
+  .home-hero .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(90deg, #6a00ff, #00b4ff);
+    color: #fff; font-size: .85rem; font-weight: 700;
+    padding: 7px 22px; border-radius: 30px;
+    margin-bottom: 24px; position: relative;
+    box-shadow: 0 4px 20px rgba(100,0,255,.4);
+  }
+  .home-hero h1 {
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, #c090ff 50%, #00d4ff 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 18px; position: relative; line-height: 1.2;
+  }
+  .home-hero p {
+    color: #9080b0; font-size: 1.1rem; max-width: 600px;
+    margin: 0 auto 32px; position: relative; line-height: 1.8;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(90deg, #7c00ff, #00b4ff);
+    color: #fff; border: none; padding: 16px 44px; border-radius: 50px;
+    font-family: 'Cairo', sans-serif; font-size: 1.05rem; font-weight: 800;
+    text-decoration: none; box-shadow: 0 8px 28px rgba(124,0,255,.5);
+    transition: transform .3s, box-shadow .3s;
+    position: relative; z-index: 5;
+  }
+  .hero-cta:hover { transform: translateY(-4px); box-shadow: 0 12px 35px rgba(124,0,255,.6); }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 20px;
+    padding: 28px 24px;
+    background: #0e0c18;
+    border-bottom: 1px solid #1e1a30;
+  }
+  .stat-item {
+    text-align: center;
+    padding: 14px 30px;
+    background: #14111e;
+    border: 1px solid #231e38;
+    border-radius: 16px;
+    min-width: 130px;
+    transition: border-color .3s, transform .3s;
+  }
+  .stat-item:hover { border-color: #6a00ff; transform: translateY(-3px); }
+  .stat-num { font-size: 1.8rem; font-weight: 900; color: #c090ff; display: block; }
+  .stat-label { font-size: .78rem; color: #6a6080; font-weight: 600; margin-top: 2px; }
+
+  /* ── FILTER BAR ── */
+  .filter-container {
+    max-width: 1160px; margin: 40px auto;
+    padding: 0 24px;
+  }
+  .filter-row {
+    display: flex; align-items: center; gap: 12px;
+    background: #12101c; border: 1px solid #221e38;
+    padding: 10px; border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    flex-wrap: wrap;
+  }
+  .filter-input-wrap { flex: 2; min-width: 200px; position: relative; }
+  .filter-input-wrap input {
+    width: 100%; background: #1a1726; border: 1px solid #2e2b3d;
+    color: #fff; padding: 12px 15px 12px 40px; border-radius: 12px;
+    font-family: 'Cairo'; outline: none; transition: border-color .3s;
+  }
+  .filter-input-wrap .icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #6a6080; }
+  .filter-select-wrap { flex: 1; min-width: 150px; }
+  .filter-select-wrap select {
+    width: 100%; background: #1a1726; border: 1px solid #2e2b3d;
+    color: #fff; padding: 12px 15px; border-radius: 12px;
+    font-family: 'Cairo'; outline: none; cursor: pointer;
+  }
+
+  /* ── RECIPE GRID ── */
+  .recipes-grid {
+    max-width: 1160px; margin: 0 auto;
+    padding: 0 24px 60px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .recipe-card {
+    background: #12101c; border: 1px solid #221e38;
+    border-radius: 20px; overflow: hidden;
+    transition: transform .3s, border-color .3s;
+    cursor: pointer; text-decoration: none; display: block; color: inherit;
+  }
+  .recipe-card:hover { transform: translateY(-6px); border-color: #6a00ff; }
+  .card-img { width: 100%; height: 200px; object-fit: cover; }
+  .card-img-placeholder {
+    width: 100%; height: 200px;
+    background: linear-gradient(135deg, #1a1428 0%, #0e0c18 100%);
+    display: flex; align-items: center; justify-content: center; font-size: 3.5rem;
+  }
+  .card-body { padding: 20px; }
+  .card-meta { display: flex; justify-content: space-between; margin-bottom: 12px; }
+  .card-cat { background: rgba(106,0,255,0.15); color: #c090ff; font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: 700; }
+  .card-diff { font-size: 0.8rem; color: #6a6080; }
+  .card-title { font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
+  .card-summary { font-size: 0.9rem; color: #8a7898; line-height: 1.6; height: 3em; overflow: hidden; }
+
+  .card-footer {
+    margin-top: 16px; padding-top: 14px; border-top: 1px solid #1e1a30;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .stats-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .card-stat { font-size: 0.8rem; color: #6a6080; display: flex; align-items: center; gap: 4px; }
+  .card-rating { color: #ffb347; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 3px; }
+  .card-date { font-size: 0.72rem; color: #4a455a; font-weight: 600; border-top: 1px solid #1a1726; padding-top: 8px; }
+
+  .empty-state { grid-column: 1 / -1; text-align: center; padding: 80px 20px; color: #6a6080; }
+</style>
+
+<div class="home-page">
+
+  <!-- HERO -->
+  <div class="home-hero">
+    <div class="badge">🍴 منصة مشاركة الوصفات</div>
+    <h1>اكتشف أشهى<br>الوصفات العربية</h1>
+    <p>شارك وصفاتك المفضلة مع ملايين المحبين للطبخ حول العالم</p>
+    <!-- هذا هو الزر الذي ينقلك لصفحة كتابة الوصفة -->
+    <a href="/recipes/add/" class="hero-cta">✨ أضف وصفتك الآن</a>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-num">{{ recipes|length }}</span>
+      <span class="stat-label">وصفة مضافة</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">{{ category_count }}</span>
+      <span class="stat-label">تصنيف</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">∞</span>
+      <span class="stat-label">إلهام يومي</span>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-container">
+    <div class="filter-row">
+      <div class="filter-input-wrap">
+        <span class="icon">🔍</span>
+        <input type="text" id="instant-search" placeholder="ابحث عن أكلة...">
+      </div>
+      <div class="filter-select-wrap">
+        <select id="category-filter">
+          <option value="all">كل التصنيفات</option>
+          <option value="أطباق رئيسية">🍽️ أطباق رئيسية</option>
+          <option value="حلويات">🍰 حلويات</option>
+          <option value="عشاء">🍛 عشاء</option>
+          <option value="سلطات">🥗 سلطات</option>
+          <option value="مشروبات">🥤 مشروبات</option>
+          <option value="مقبلات">🫕 مقبلات</option>
+          <option value="شوربات">🍲 شوربات</option>
+          <option value="مخبوزات">🥐 مخبوزات</option>
+        </select>
+      </div>
+      <div class="filter-select-wrap">
+        <select id="difficulty-filter">
+          <option value="all">كل المستويات</option>
+          <option value="سهل">سهل</option>
+          <option value="متوسط">متوسط</option>
+          <option value="صعب">صعب</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECIPES GRID -->
+  <div class="recipes-grid">
+    {% if recipes %}
+      {% for r in recipes %}
+      <a href="{% url 'recipe_detail' r.id %}" class="recipe-card">
+        {% if r.image %}
+          <img class="card-img" src="{{ r.image }}" alt="{{ r.name }}">
+        {% else %}
+          <div class="card-img-placeholder">🍽️</div>
+        {% endif %}
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="card-cat">{{ r.category }}</span>
+            <span class="card-diff">{{ r.difficulty }}</span>
+          </div>
+          <div class="card-title">{{ r.name }}</div>
+          <div class="card-summary">{{ r.summary }}</div>
+          <div class="card-footer">
+            <div class="stats-row">
+              <span class="card-stat">⏳ {{ r.prep_time|default:"0" }}</span>
+              <span class="card-stat">🔥 {{ r.cooking_time|default:"0" }}</span>
+              <span class="card-stat">👥 {{ r.servings }}</span>
+              <span class="card-rating">⭐ {{ r.user_rating|default:"0" }}</span>
+            </div>
+            <div class="card-date">🕒 {{ r.created_at|default:"منذ قليل" }}</div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">لا توجد وصفات مضافة حالياً. كن أول من يضيف وصفة!</div>
+    {% endif %}
+  </div>
+
+</div>
+
+<script>
+  window.filterRecipes = function () {
+    const searchText = document.getElementById('instant-search').value.toLowerCase();
+    const selectedCat = document.getElementById('category-filter').value;
+    const selectedDiff = document.getElementById('difficulty-filter').value;
+    const cards = document.querySelectorAll('.recipe-card');
+
+    cards.forEach(card => {
+      const title = card.querySelector('.card-title').textContent.toLowerCase();
+      const summary = card.querySelector('.card-summary').textContent.toLowerCase();
+      const category = card.querySelector('.card-cat').textContent.trim();
+      const difficulty = card.querySelector('.card-diff').textContent.trim();
+
+      const matchesSearch = title.includes(searchText) || summary.includes(searchText);
+      const matchesCat = (selectedCat === 'all' || category === selectedCat);
+      const matchesDiff = (selectedDiff === 'all' || difficulty === selectedDiff);
+
+      if (matchesSearch && matchesCat && matchesDiff) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  document.getElementById('instant-search').addEventListener('input', window.filterRecipes);
+  document.getElementById('category-filter').addEventListener('change', window.filterRecipes);
+  document.getElementById('difficulty-filter').addEventListener('change', window.filterRecipes);
+</script>
 {% endblock %}

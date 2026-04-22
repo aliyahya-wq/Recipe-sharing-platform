@@ -1,0 +1,40 @@
+﻿{% extends 'baes.html' %}
+
+{% block title %}{{ recipe.name }} - منصة الأكل{% endblock %}
+
+{% block content %}
+<h1>{{ recipe.name }}</h1>
+<p><strong>نبذة:</strong> {{ recipe.summary }}</p>
+
+<h2>المكونات</h2>
+<table border="1">
+    <tr>
+        <th>المكون</th>
+        <th>الكمية</th>
+    </tr>
+    {% for ingredient in recipe.ingredients %}
+    <tr>
+        <td>{{ ingredient.name }}</td>
+        <td>{{ ingredient.amount }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>شرح الوصفة</h2>
+<p>{{ recipe.instructions }}</p>
+
+<p><strong>وقت الطهي:</strong> {{ recipe.cooking_time }}</p>
+<p><strong>عدد الأشخاص:</strong> {{ recipe.servings }}</p>
+
+<h2>التعليقات</h2>
+{% for comment in recipe.comments %}
+<div>
+    <strong>{{ comment.user }}:</strong> {{ comment.text }}
+    {% for reply in comment.replies %}
+    <div style="margin-left: 20px;">
+        <strong>{{ reply.user }}:</strong> {{ reply.text }}
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+{% endblock %}

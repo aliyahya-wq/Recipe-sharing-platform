@@ -1,30 +1,66 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}منصة الأكل{% endblock %}</title>
+    <title>{% block title %}منصةمشاركةالوصفات{% endblock %}</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        nav { background-color: #333; color: white; padding: 10px; }
-        nav ul { list-style-type: none; margin: 0; padding: 0; display: flex; }
-        nav li { margin: 0 15px; }
-        nav a { color: white; text-decoration: none; }
-        nav a:hover { text-decoration: underline; }
-        .container { padding: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            background-color: #110e4b;
+            color: white;
+            padding: 10px;
+            font-size: x-large;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 4px;
+            padding: 10px;
+            display: flex;
+        }
+
+        nav li {
+            margin: 0 30px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            padding: 20px;
+        }
     </style>
 </head>
+
 <body>
     <nav>
         <ul>
+            <li>غير اكلان مافيش</li>
             <li><a href="{% url 'home' %}">الرئيسية</a></li>
             <li><a href="{% url 'recipes' %}">الوصفات</a></li>
+            <li><a href="{% url 'favorites' %}">المفضلة</a></li>
             <li><a href="{% url 'about' %}">من نحن</a></li>
             <li><a href="{% url 'contact' %}">تواصل بنا</a></li>
+            <li><a href="{% url 'login' %}">تسجيل الدخول</a></li>
+            <li><a href="{% url 'register' %}">حساب جديد</a></li>
         </ul>
     </nav>
     <div class="container">
         {% block content %}{% endblock %}
     </div>
 </body>
+
 </html>

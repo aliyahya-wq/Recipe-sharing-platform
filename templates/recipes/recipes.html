@@ -1,8 +1,122 @@
 {% extends 'baes.html' %}
-
-{% block title %}الوصفات - منصة الأكل{% endblock %}
+{% block title %}استكشف الوصفات - منصة الأكل{% endblock %}
 
 {% block content %}
-<h1>الوصفات</h1>
-<p>هنا ستجد جميع الوصفات المتاحة.</p>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+.recipes-page {
+  font-family: 'Cairo', sans-serif;
+  background: #08060f;
+  min-height: 100vh;
+  direction: rtl;
+  color: #e8e0d5;
+  padding-bottom: 60px;
+}
+
+.page-header {
+  background: linear-gradient(135deg, #1a0035 0%, #0a001a 100%);
+  padding: 60px 24px;
+  text-align: center;
+  border-bottom: 1px solid #1e1a30;
+  margin-bottom: 40px;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff, #c090ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+
+.page-header p { color: #9080b0; }
+
+.recipes-grid {
+  max-width: 1160px; margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.recipe-card {
+  background: #12101c;
+  border: 1px solid #221e38;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.recipe-card:hover {
+  transform: translateY(-5px);
+  border-color: #6a00ff;
+  box-shadow: 0 10px 30px rgba(106,0,255,0.2);
+}
+
+.card-img { width: 100%; height: 200px; object-fit: cover; }
+.card-placeholder {
+  width: 100%; height: 200px;
+  background: #1a1428;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem;
+}
+
+.card-body { padding: 20px; }
+.card-cat {
+  font-size: 0.75rem; color: #c090ff;
+  background: rgba(106,0,255,0.1);
+  padding: 3px 10px; border-radius: 10px;
+  margin-bottom: 10px; display: inline-block;
+}
+
+.card-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.card-summary { color: #8a7898; font-size: 0.9rem; line-height: 1.6; height: 3em; overflow: hidden; }
+
+.empty-state {
+  text-align: center; padding: 100px 20px;
+  grid-column: 1 / -1;
+}
+</style>
+
+<div class="recipes-page">
+  <div class="page-header">
+    <h1>{{ page_title|default:"استكشف عالم الطبخ" }}</h1>
+    <p>تصفح جميع الوصفات التي شاركها المبدعون في منصتنا</p>
+  <div style="text-align: center; margin-bottom: 40px;">
+    <a href="{% url 'recipe_add' %}" style="display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(90deg, #ff8c00, #e6005a); color: #fff; text-decoration: none; padding: 15px 40px; border-radius: 50px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(255, 140, 0, 0.3); transition: transform 0.3s, box-shadow 0.3s;">
+      <span>✨</span> إضافة وصفة جديدة
+    </a>
+  </div>
+
+  <div class="recipes-grid">
+    {% if recipes %}
+      {% for r in recipes %}
+      <a href="{% url 'recipe_detail' r.id %}" class="recipe-card">
+        {% if r.image %}
+          <img src="{{ r.image }}" alt="{{ r.name }}" class="card-img">
+        {% else %}
+          <div class="card-placeholder">🍽️</div>
+        {% endif %}
+        <div class="card-body">
+          <span class="card-cat">{{ r.category }}</span>
+          <h3 class="card-title">{{ r.name }}</h3>
+          <p class="card-summary">{{ r.summary }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div style="font-size: 4rem; margin-bottom: 20px;">🥗</div>
+        <h2>لا توجد وصفات بعد</h2>
+        <p>ابدأ بإضافة أول وصفة الآن!</p>
+        <a href="{% url 'recipe_add' %}" style="display: inline-block; margin-top: 20px; color: #c090ff; text-decoration: none; border: 1px solid #c090ff; padding: 10px 25px; border-radius: 25px;">إضافة وصفة جديدة</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
