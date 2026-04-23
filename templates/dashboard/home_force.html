@@ -1,0 +1,189 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block page_title %}لوحة القيادة{% endblock %}
+
+{% block dashboard_content %}
+<!-- استدعاء مكتبة Chart.js للرسوم البيانية -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+<!-- Stats Cards: بطاقات الإحصائيات السريعة -->
+<div class="card-grid">
+    <!-- بطاقة عدد المستخدمين -->
+    <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div class="stat-info">
+            <h3 style="color: white;">{{ stats.total_users }}</h3>
+            <p style="color: rgba(255,255,255,0.8);">المستخدمين</p>
+        </div>
+        <div class="stat-icon" style="background: rgba(255,255,255,0.2);">
+            <i class="fas fa-users"></i>
+        </div>
+    </div>
+
+    <!-- بطاقة عدد الوصفات -->
+    <div class="stat-card" style="background: linear-gradient(135deg, #ff5858 0%, #f09819 100%); color: white;">
+        <div class="stat-info">
+            <h3 style="color: white;">{{ stats.total_recipes }}</h3>
+            <p style="color: rgba(255,255,255,0.8);">الوصفات</p>
+        </div>
+        <div class="stat-icon" style="background: rgba(255,255,255,0.2);">
+            <i class="fas fa-utensils"></i>
+        </div>
+    </div>
+
+    <!-- بطاقة عدد التعليقات -->
+    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+        <div class="stat-info">
+            <h3 style="color: white;">{{ stats.total_comments }}</h3>
+            <p style="color: rgba(255,255,255,0.8);">التعليقات</p>
+        </div>
+        <div class="stat-icon" style="background: rgba(255,255,255,0.2);">
+            <i class="fas fa-comments"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section: قسم الرسوم البيانية -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 30px;">
+    <!-- Line Chart: رسم بياني خطي لنشاط المنصة (بيانات تجريبية حالياً) -->
+    <div class="table-container">
+        <h3 style="margin-bottom: 20px; color: #2c3e50;">نشاط المنصة</h3>
+        <div style="position: relative; height: 350px; width: 100%;">
+            <canvas id="activityChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Pie Chart: رسم بياني دائري لتوزيع التصنيفات -->
+    <div class="table-container">
+        <h3 style="margin-bottom: 20px; color: #2c3e50;">توزيع التصنيفات</h3>
+        <div style="position: relative; height: 350px; width: 100%;">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px;">
+    <!-- Popular Recipes: جدول أكثر الوصفات شعبية -->
+    <div class="table-container">
+        <h3 style="margin-bottom: 20px; color: #2c3e50;">أكثر الوصفات شعبية</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>الوصفة</th>
+                    <th>الإعجابات</th>
+                    <th>الناشر</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for recipe in stats.popular_recipes %}
+                <tr>
+                    <td>{{ recipe.title }}</td>
+                    <td>
+                        <span class="status-badge status-active">
+                            <i class="fas fa-heart"></i> {{ recipe.total_likes }}
+                        </span>
+                    </td>
+                    <td>{{ recipe.author.username }}</td>
+                    <td>
+                        <a href="{% url 'recipe_detail' recipe.pk %}" target="_blank" class="action-btn" title="عرض">
+                            <i class="fas fa-eye" style="color: #3498db;"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center;">لا توجد بيانات</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Recent Users: جدول آخر المشتركين -->
+    <div class="table-container">
+        <h3 style="margin-bottom: 20px; color: #2c3e50;">آخر المشتركين</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>المستخدم</th>
+                    <th>تاريخ الانضمام</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in stats.recent_users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.date_joined|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if user.is_active %}
+                        <span class="status-badge status-active">نشط</span>
+                        {% else %}
+                        <span class="status-badge status-inactive">محظور</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align: center;">لا توجد بيانات</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // تهيئة الرسم البياني الدائري (Pie Chart) للتصنيفات
+    const ctxPie = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: {{ stats.category_labels | safe }}, // تسميات الفئات من الـ View
+        datasets: [{
+            data: {{ stats.category_data | safe }}, // بيانات الفئات من الـ View
+        backgroundColor: [
+            '#ff6b6b', '#4facfe', '#1dd1a1', '#f09819', '#9b59b6', '#34495e'
+        ],
+        borderWidth: 0
+            }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+    });
+
+    // تهيئة الرسم البياني الخطي (بيانات توضيحية)
+    const ctxLine = document.getElementById('activityChart').getContext('2d');
+    new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+            datasets: [{
+                label: 'المستخدمين الجدد',
+                data: [12, 19, 3, 5, 2, 3],
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}
