@@ -1,0 +1,128 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% block page_title %}إدارة المستخدمين{% endblock %}
+
+{% block dashboard_content %}
+<div class="table-container-wrapper">
+
+    <!-- Staff Section -->
+    <div class="table-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border-color);">
+            <h3 style="padding: 0; border: none;">المشرفين والطهاة (Admin/Staff)</h3>
+            {% if request.user.is_superuser %}
+            <a href="{% url 'dashboard:add_staff_user' %}" class="action-btn" style="width: auto; padding: 0 16px; gap: 8px;">
+                <i class="fas fa-plus"></i> إضافة مشرف
+            </a>
+            {% endif %}
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>المستخدم</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>تاريخ الانضمام</th>
+                    <th>نوع الحساب</th>
+                    <th>الحالة</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in staff_users %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #eef2ff; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <span style="font-weight: 600;">{{ user.username }}</span>
+                        </div>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.date_joined|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if user.is_superuser %}
+                        <span style="font-size: 0.75rem; background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 12px; font-weight: 700;">مدير نظام</span>
+                        {% else %}
+                        <span style="font-size: 0.75rem; background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 12px; font-weight: 700;">مشرف</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_active %}
+                        <span class="status-badge status-active">نشط</span>
+                        {% else %}
+                        <span class="status-badge status-inactive">محظور</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <a href="{% url 'dashboard:user_detail' user.id %}" class="action-btn" title="عرض"><i class="fas fa-eye"></i></a>
+                            {% if request.user.is_superuser %}
+                            <a href="{% url 'dashboard:edit_user' user.id %}" class="action-btn" title="تعديل"><i class="fas fa-edit"></i></a>
+                            <form method="post" action="{% url 'dashboard:delete_user' user.id %}" id="delete-staff-{{ user.id }}" style="display: none;">{% csrf_token %}</form>
+                            <button type="button" class="action-btn" onclick="showDeleteModal('delete-staff-{{ user.id }}')" title="حذف"><i class="fas fa-trash-alt"></i></button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">لا يوجد مشرفين حالياً</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Regular Users Section -->
+    <div class="table-container">
+        <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color);">
+            <h3 style="padding: 0; border: none;">المستخدمين المسجلين</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>المستخدم</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>تاريخ الانضمام</th>
+                    <th>الحالة</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in regular_users %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #f8fafc; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span style="font-weight: 600;">{{ user.username }}</span>
+                        </div>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.date_joined|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if user.is_active %}
+                        <span class="status-badge status-active">نشط</span>
+                        {% else %}
+                        <span class="status-badge status-inactive">محظور</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 8px;">
+                            <a href="{% url 'dashboard:user_detail' user.id %}" class="action-btn" title="عرض"><i class="fas fa-eye"></i></a>
+                            <a href="{% url 'dashboard:edit_user' user.id %}" class="action-btn" title="تعديل"><i class="fas fa-edit"></i></a>
+                            <form method="post" action="{% url 'dashboard:toggle_user_status' user.id %}" id="toggle-user-{{ user.id }}" style="display: none;">{% csrf_token %}</form>
+                            <button type="button" class="action-btn" onclick="showConfirmModal({title: 'تغيير الحالة', message: 'هل تريد تغيير حالة هذا المستخدم؟', action: () => document.getElementById('toggle-user-{{ user.id }}').submit()})" title="تغيير الحالة">
+                                <i class="fas {% if user.is_active %}fa-ban{% else %}fa-check{% endif %}"></i>
+                            </button>
+                            <form method="post" action="{% url 'dashboard:delete_user' user.id %}" id="delete-user-{{ user.id }}" style="display: none;">{% csrf_token %}</form>
+                            <button type="button" class="action-btn" onclick="showDeleteModal('delete-user-{{ user.id }}')" title="حذف"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 32px;">لا يوجد مستخدمين مسجلين</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

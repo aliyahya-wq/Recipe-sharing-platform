@@ -2,6 +2,7 @@ import base64
 import os
 import uuid
 
+
 from django.conf import settings
 from django.shortcuts import render, redirect
 
@@ -223,3 +224,5 @@ def recipe_result(request):
     if not recipe:
         return redirect('recipe_add')
     return redirect('recipe_detail', recipe_id=recipe['id'])
+def home(request):
+    return render(request, 'baes.html')

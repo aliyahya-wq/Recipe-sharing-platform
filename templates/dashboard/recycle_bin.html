@@ -1,0 +1,78 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% block page_title %}سلة المحذوفات{% endblock %}
+
+{% block dashboard_content %}
+<div class="table-container" style="border-top: 5px solid #636e72;">
+    <div
+        style="background: linear-gradient(135deg, #636e72 0%, #2d3436 100%); padding: 15px 20px; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px;">
+        <h3 style="margin: 0; color: white; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-trash-alt"></i>
+            العناصر المحذوفة (Recycle Bin)
+        </h3>
+    </div>
+
+    <!-- جدول العناصر المحذوفة -->
+    <table style="margin-top: 10px;">
+        <thead>
+            <tr>
+                <th>النوع</th>
+                <th>العنصر</th>
+                <th>تاريخ الحذف</th>
+                <th>الإجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in deleted_items %}
+            <tr>
+                <td>
+                    <!-- تحديد نوع العنصر المحذوف -->
+                    {% if item.type == 'user' %}
+                    <span
+                        style="background: #efecff; color: #6c5ce7; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;">مستخدم</span>
+                    {% elif item.type == 'recipe' %}
+                    <span
+                        style="background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;">وصفة</span>
+                    {% elif item.type == 'category' %}
+                    <span
+                        style="background: #fff8e1; color: #f57f17; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;">تصنيف</span>
+                    {% elif item.type == 'comment' %}
+                    <span
+                        style="background: #e1f5fe; color: #01579b; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;">تعليق</span>
+                    {% endif %}
+                </td>
+                <td style="font-weight: bold; color: #2d3436;">{{ item.title }}</td>
+                <td style="color: #636e72;">{{ item.deleted_at|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <div style="display: flex; gap: 10px;">
+                        <!-- زر الاستعادة -->
+                        <form method="post" action="{% url 'dashboard:restore_item' item.type item.id %}"
+                            style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="action-btn" title="استعادة"
+                                style="background: #e1f5fe; border: none; padding: 5px 10px; border-radius: 4px; color: #01579b; cursor: pointer;">
+                                <i class="fas fa-undo"></i> استعادة
+                            </button>
+                        </form>
+
+                        <!-- زر الحذف النهائي -->
+                        <form method="post" action="{% url 'dashboard:purge_item' item.type item.id %}"
+                            style="display: inline;" data-modal-id="purge-{{ item.type }}-{{ item.id }}">
+                            {% csrf_token %}
+                            <button type="button" class="action-btn" title="حذف نهائي"
+                                style="background: #ffebee; border: none; padding: 5px 10px; border-radius: 4px; color: #c62828; cursor: pointer;"
+                                onclick="showDeleteModal('purge-{{ item.type }}-{{ item.id }}', 'هل أنت متأكد من الحذف النهائي؟ لا يمكن التراجع عن هذا الإجراء.')">
+                                <i class="fas fa-times-circle"></i> حذف نهائي
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 40px; color: #999;">سلة المحذوفات فارغة</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

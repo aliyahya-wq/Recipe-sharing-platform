@@ -1,0 +1,187 @@
+{% extends 'dashboard/base_dashboard.html' %}
+<!-- VERSION_RESTORED_AESTHETIC_V1 -->
+{% block page_title %}
+{% if is_add %}إضافة مشرف جديد{% else %}تعديل المستخدم{% endif %}
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- حاوية النموذج الرئيسية مع تأثير ظهور متحرك -->
+<div style="width: 100%; display: flex; justify-content: center; padding: 20px; animation: fadeIn 0.5s ease;">
+    <div class="stat-card"
+        style="width: 100%; max-width: 700px; display: block; backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); margin: 0;">
+
+        <!-- عنوان النموذج يتغير بناءً على الحالة (إضافة أو تعديل) -->
+        <h2
+            style="margin-bottom: 30px; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; display: flex; align-items: center; justify-content: flex-start; gap: 15px; color: #1e1e2d; text-align: right;">
+            {% if is_add %}
+            <i class="fas fa-user-plus" style="color: #4e73df;"></i> إضافة مشرف جديد
+            {% else %}
+            <i class="fas fa-user-edit" style="color: #4e73df;"></i> تعديل: {{ target_user.username }}
+            {% endif %}
+        </h2>
+
+        <!-- عرض رسائل التنبيه والخطأ -->
+        {% if messages %}
+        {% for message in messages %}
+        <div
+            style="background: #fff5f5; border-right: 4px solid #f56565; color: #c53030; padding: 15px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <i class="fas fa-exclamation-circle"></i> {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+            {% csrf_token %}
+
+            <!-- حقل اسم المستخدم -->
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #4a5568;">
+                    <i class="fas fa-user" style="width: 20px;"></i> اسم المستخدم
+                </label>
+                <input type="text" name="username" value="{{ target_user.username|default:'' }}" required
+                    style="width: 100%; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 10px; transition: all 0.3s; background: #f8fafc;">
+            </div>
+
+            <!-- حقل البريد الإلكتروني -->
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #4a5568;">
+                    <i class="fas fa-envelope" style="width: 20px;"></i> البريد الإلكتروني
+                </label>
+                <input type="email" name="email" value="{{ target_user.email|default:'' }}" required
+                    style="width: 100%; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 10px; transition: all 0.3s; background: #f8fafc;">
+            </div>
+
+            <!-- حقل كلمة المرور مع زر لإظهار/إخفاء الكلمة -->
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #4a5568;">
+                    <i class="fas fa-key" style="width: 20px;"></i> كلمة المرور
+                </label>
+                <div style="position: relative;">
+                    <input type="password" name="password" id="passwordInput" {% if is_add %}required{% endif %}
+                        placeholder="{% if not is_add %}اتركه فارغاً للإبقاء على الحالية{% else %}أدخل كلمة السر الجديدة{% endif %}"
+                        style="width: 100%; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 10px; transition: all 0.3s; background: #f8fafc; padding-left: 45px;">
+                    <button type="button" onclick="togglePassword()"
+                        style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #a0aec0; cursor: pointer; padding: 5px; transition: color 0.3s;">
+                        <i id="toggleIcon" class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <script>
+                // دالة للتبديل بين إظهار وإخفاء كلمة المرور
+                function togglePassword() {
+                    const input = document.getElementById('passwordInput');
+                    const icon = document.getElementById('toggleIcon');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.className = 'fas fa-eye-slash';
+                    } else {
+                        input.type = 'password';
+                        icon.className = 'fas fa-eye';
+                    }
+                }
+            </script>
+
+            <!-- خيارات الصلاحيات ونوع الحساب -->
+            {% with s=target_user.is_staff su=target_user.is_superuser %}
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #4a5568;">
+                    <i class="fas fa-shield-alt" style="width: 20px;"></i> الصلاحيات / نوع الحساب
+                </label>
+                <select name="role"
+                    style="width: 100%; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; cursor: pointer;">
+                    <option value="regular" {% if not s %}selected{% endif %}>مستخدم عادي (وصول عام فقط)</option>
+                    <option value="staff" {% if s and not su %}selected{% endif %}>مشرف / طاهي (وصول محدود للوحة التحكم)
+                    </option>
+                    <option value="superuser" {% if su %}selected{% endif %}>مدير نظام (Admin) - تحكم كامل</option>
+                </select>
+                <small style="color: #718096; display: block; margin-top: 8px;">
+                    <i class="fas fa-info-circle"></i> مدير النظام يملك صلاحيات كاملة لحذف وتعديل المحتوى والمستخدمين.
+                </small>
+            </div>
+            {% endwith %}
+
+            <!-- بيانات إضافية للعرض فقط في حالة التعديل -->
+            {% if not is_add %}
+            <div
+                style="background: #edf2f7; padding: 20px; border-radius: 12px; margin-top: 10px; border: 1px solid #e2e8f0;">
+                <h4
+                    style="margin: 0 0 15px 0; color: #2d3748; font-size: 1rem; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-database" style="color: #4a5568;"></i> بيانات تقنية (للعرض فقط)
+                </h4>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <span style="font-size: 0.8rem; color: #718096; display: block;">تاريخ الانضمام</span>
+                        <strong style="color: #2d3748;">{{ target_user.date_joined|date:"Y-m-d H:i" }}</strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.8rem; color: #718096; display: block;">آخر دخول</span>
+                        {% with ll=target_user.last_login %}
+                        <strong style="color: #2d3748;">{{ ll|date:"Y-m-d"|default:"-" }}</strong>
+                        {% endwith %}
+                    </div>
+                    <div>
+                        <span style="font-size: 0.8rem; color: #718096; display: block;">معرف المستخدم (ID)</span>
+                        <strong style="color: #2d3748;">#{{ target_user.id }}</strong>
+                    </div>
+                </div>
+
+                <!-- تفعيل/تعطيل الحساب -->
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #e2e8f0;">
+                    <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                        <input type="checkbox" name="is_active" {% if target_user.is_active %}checked{% endif %}
+                            style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="font-weight: 600; color: #2d3748;">حساب نشط (إلغاء التحديد لتعطيل الدخول)</span>
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- أزرار الإجراءات -->
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button type="submit"
+                    style="flex: 2; background: #1e1e2d; color: white; border: none; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fas fa-save"></i> حفظ التغييرات
+                </button>
+                <a href="{% url 'dashboard:user_list' %}"
+                    style="flex: 1; background: #edf2f7; color: #4a5568; text-decoration: none; padding: 14px; border-radius: 10px; text-align: center; font-weight: 600; transition: background 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fas fa-times"></i> إلغاء
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* تحسينات CSS للنموذج */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    input:focus,
+    select:focus {
+        border-color: #4e73df;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.1);
+        background: #fff !important;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        opacity: 0.95;
+    }
+
+    a:hover {
+        background: #e2e8f0;
+    }
+</style>
+{% endblock %}
