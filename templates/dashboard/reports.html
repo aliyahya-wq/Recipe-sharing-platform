@@ -1,0 +1,158 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% block page_title %}التقارير والإحصائيات{% endblock %}
+
+{% block dashboard_content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Period Filter: أزرار تصفية المدة الزمنية -->
+<div style="margin-bottom: 25px; display: flex; justify-content: flex-end; gap: 10px;">
+    <a href="?period=week" class="period-btn {% if stats.period == 'week' %}active{% endif %}"
+        style="text-decoration: none; padding: 8px 15px; border-radius: 20px; background: {% if stats.period == 'week' %}#667eea{% else %}#fff{% endif %}; color: {% if stats.period == 'week' %}#fff{% else %}#667eea{% endif %}; border: 1px solid #667eea;">أسبوعي</a>
+    <a href="?period=month" class="period-btn {% if stats.period == 'month' %}active{% endif %}"
+        style="text-decoration: none; padding: 8px 15px; border-radius: 20px; background: {% if stats.period == 'month' %}#667eea{% else %}#fff{% endif %}; color: {% if stats.period == 'month' %}#fff{% else %}#667eea{% endif %}; border: 1px solid #667eea;">شهري</a>
+    <a href="?period=year" class="period-btn {% if stats.period == 'year' %}active{% endif %}"
+        style="text-decoration: none; padding: 8px 15px; border-radius: 20px; background: {% if stats.period == 'year' %}#667eea{% else %}#fff{% endif %}; color: {% if stats.period == 'year' %}#fff{% else %}#667eea{% endif %}; border: 1px solid #667eea;">سنوي</a>
+</div>
+
+<!-- Stats Summary: بطاقات ملخص الإحصائيات -->
+<div class="card-grid">
+    <div class="stat-card">
+        <div class="stat-info">
+            <p>مستخدمين جدد</p>
+            <h3>{{ stats.users_count }}</h3>
+        </div>
+        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="fas fa-user-plus"></i>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <p>وصفات منشورة</p>
+            <h3>{{ stats.recipes_count }}</h3>
+        </div>
+        <div class="stat-icon" style="background: linear-gradient(135deg, #1dd1a1 0%, #10ac84 100%);">
+            <i class="fas fa-utensils"></i>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <p>تعليقات جديدة</p>
+            <h3>{{ stats.comments_count }}</h3>
+        </div>
+        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <i class="fas fa-comment"></i>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <p>إجمالي الزيارات</p>
+            <h3>{{ stats.visits_count }}</h3>
+        </div>
+        <div class="stat-icon" style="background: linear-gradient(135deg, #f09819 0%, #edde5d 100%);">
+            <i class="fas fa-chart-line"></i>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-top: 30px;">
+    <!-- Main Charts: الرسم البياني للنمو -->
+    <div class="table-container" style="padding: 20px;">
+        <h4 style="margin-top: 0; color: #2d3436; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-chart-bar" style="color: #6c5ce7;"></i>
+            نمو النشاط خلال {{ stats.label }}
+        </h4>
+        <canvas id="growthChart" height="150"></canvas>
+    </div>
+
+    <!-- Country Distribution: توزيع الزوار حسب الدولة (تجريبي) -->
+    <div class="table-container" style="padding: 20px;">
+        <h4 style="margin-top: 0; color: #2d3436; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-globe" style="color: #1dd1a1;"></i>
+            مصادر الدخول (حسب الدولة)
+        </h4>
+        <div style="height: 250px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="countryChart"></canvas>
+        </div>
+        <div style="margin-top: 20px;">
+            {% for country in traffic_by_country %}
+            <div
+                style="display: flex; justify-content: space-between; font-size: 0.9rem; padding: 5px 0; border-bottom: 1px solid #f0f0f0;">
+                <span style="color: #636e72;">{{ country.country }}</span>
+                <span style="font-weight: bold; color: #2d3436;">{{ country.count }} زيارة</span>
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: #999; font-size: 0.85rem;">لا توجد بيانات متاحة حالياً</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- إعداد الرسم البياني الشريطي للنمو ---
+    const ctx = document.getElementById('growthChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['مستخدمين', 'وصفات', 'تعليقات'],
+            datasets: [{
+                label: 'النشاط الجديد',
+                data: [{{ stats.users_count }}, {{ stats.recipes_count }}, {{ stats.comments_count }}],
+        backgroundColor: [
+        'rgba(102, 126, 234, 0.7)',
+        'rgba(29, 209, 161, 0.7)',
+        'rgba(79, 172, 254, 0.7)'
+    ],
+        borderColor: [
+        '#667eea',
+        '#1dd1a1',
+        '#4facfe'
+    ],
+        borderWidth: 1
+            }]
+        },
+        options: {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true }
+        },
+        plugins: {
+            legend: { display: false }
+        }
+    }
+    });
+
+    // --- إعداد الرسم البياني الدائري للدول ---
+    const countryCtx = document.getElementById('countryChart').getContext('2d');
+    new Chart(countryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for c in traffic_by_country %}'{{ c.country }}',{% endfor %}],
+        datasets: [{
+            data: [{% for c in traffic_by_country %}{{ c.count }}, {% endfor %}],
+        backgroundColor: ['#667eea', '#1dd1a1', '#f09819', '#ff6b6b', '#a29bfe'],
+        borderWidth: 0
+            }]
+        },
+        options: {
+        cutout: '70%',
+        plugins: {
+            legend: { display: false }
+        }
+    }
+    });
+</script>
+
+<style>
+    /* تنسيق أزرار الفلترة */
+    .period-btn {
+        transition: 0.3s;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .period-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+</style>
+{% endblock %}

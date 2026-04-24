@@ -1,728 +1,488 @@
 {% extends 'baes.html' %}
 
-{% block title %}{{ recipe.name }} - منصة الأكل{% endblock %}
+{% block title %}{{ recipe.title }} - PlatEeat{% endblock %}
 
 {% block content %}
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
 
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  .recipe-page {
-    font-family: 'Cairo', sans-serif;
-    background: #0f0f13;
-    min-height: 100vh;
-    color: #e8e0d5;
-    direction: rtl;
-  }
-
-  /* ===== HERO ===== */
-  .recipe-hero {
-    position: relative;
-    background: linear-gradient(135deg, #1a0a00 0%, #2d1200 40%, #1a0814 100%);
-    padding: 60px 24px 80px;
-    text-align: center;
-    overflow: hidden;
-  }
-
-  .recipe-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 70% 60% at 50% 0%, rgba(255, 140, 0, .18) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 40% at 80% 80%, rgba(180, 0, 80, .12) 0%, transparent 60%);
-  }
-
-  /* ===== HERO IMAGE ===== */
-  .hero-image-wrap {
-    max-width: 860px;
-    margin: 0 auto -40px;
-    padding: 0 24px;
-    position: relative;
-    z-index: 3;
-  }
-
-  .hero-image-wrap img {
-    width: 100%;
-    height: 360px;
-    object-fit: cover;
-    border-radius: 22px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .6);
-    border: 2px solid #2a2535;
-  }
-
-  .hero-badge {
-    display: inline-block;
-    background: linear-gradient(90deg, #ff8c00, #e6005a);
-    color: #fff;
-    font-size: .78rem;
-    font-weight: 700;
-    padding: 5px 18px;
-    border-radius: 30px;
-    letter-spacing: .5px;
-    margin-bottom: 18px;
-    position: relative;
-  }
-
-  .recipe-hero h1 {
-    font-size: clamp(1.8rem, 5vw, 3rem);
-    font-weight: 900;
-    background: linear-gradient(135deg, #fff 0%, #ffb347 60%, #ff8c00 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 16px;
-    position: relative;
-  }
-
-  .recipe-hero .summary {
-    max-width: 680px;
-    margin: 0 auto;
-    color: #c8b89a;
-    font-size: 1.05rem;
-    line-height: 1.8;
-    position: relative;
-  }
-
-  /* ===== META STRIP ===== */
-  .meta-strip {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 14px;
-    padding: 28px 24px;
-    background: #16141a;
-    border-bottom: 1px solid #2a2530;
-  }
-
-  .meta-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #1e1b24;
-    border: 1px solid #2e2b38;
-    border-radius: 14px;
-    padding: 12px 16px;
-    min-width: 120px;
-    transition: border-color .3s, transform .3s;
-  }
-
-  .meta-card:hover {
-    border-color: #ff8c00;
-    transform: translateY(-3px);
-  }
-
-  .meta-icon {
-    font-size: 1.5rem;
-    line-height: 1;
-  }
-
-  .meta-info {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .meta-label {
-    font-size: .72rem;
-    color: #7a7085;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-
-  .meta-value {
-    font-size: .95rem;
-    font-weight: 700;
-    color: #ffe0a0;
-  }
-
-  /* ===== MAIN LAYOUT ===== */
-  .recipe-body {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 40px 24px 60px;
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 32px;
-  }
-
-  @media (max-width: 768px) {
-    .recipe-body {
-      grid-template-columns: 1fr;
+    .recipe-detail-container {
+        font-family: 'Cairo', sans-serif;
+        background: var(--bg-main);
+        min-height: 100vh;
+        direction: rtl;
+        padding-bottom: 80px;
+        color: var(--text-main);
     }
-  }
 
-  /* ===== SECTION CARDS ===== */
-  .section-card {
-    background: #1a1720;
-    border: 1px solid #2a2535;
-    border-radius: 20px;
-    padding: 28px;
-    margin-bottom: 24px;
-    transition: border-color .3s;
-  }
+    .recipe-header {
+        background: var(--bg-main);
+        padding: 60px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
-  .section-card:hover {
-    border-color: #3d3550;
-  }
+    .header-content {
+        flex: 1;
+        min-width: 300px;
+    }
 
-  .section-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 22px;
-    padding-bottom: 14px;
-    border-bottom: 2px solid #2a2535;
-  }
+    .header-image {
+        flex: 1;
+        min-width: 300px;
+        height: 500px;
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+    }
 
-  .section-title .icon-circle {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }
+    .header-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
-  .orange-circle {
-    background: linear-gradient(135deg, #ff8c00, #ff5500);
-  }
+    .recipe-cat {
+        color: var(--secondary);
+        font-weight: 800;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        display: block;
+    }
 
-  .pink-circle {
-    background: linear-gradient(135deg, #e6005a, #a0004a);
-  }
+    .recipe-title {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #fff;
+        margin-bottom: 25px;
+        line-height: 1.2;
+    }
 
-  .green-circle {
-    background: linear-gradient(135deg, #00c87a, #008c5a);
-  }
+    .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
 
-  .blue-circle {
-    background: linear-gradient(135deg, #007aff, #0044cc);
-  }
+    .meta-box {
+        background: var(--bg-card);
+        padding: 20px;
+        border-radius: 20px;
+        text-align: center;
+        border: 1px solid var(--border);
+    }
 
-  /* ===== INGREDIENTS TABLE ===== */
-  .ingredients-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: .95rem;
-  }
+    .meta-label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
 
-  .ingredients-table thead th {
-    background: linear-gradient(90deg, #ff8c00, #e6005a);
-    color: #fff;
-    padding: 12px 16px;
-    font-weight: 700;
-    text-align: right;
-  }
+    .meta-value {
+        font-weight: 800;
+        color: #fff;
+        font-size: 1.05rem;
+    }
 
-  .ingredients-table thead th:first-child {
-    border-radius: 0 10px 0 0;
-  }
+    .author-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: var(--bg-card);
+        border-radius: 24px;
+        border: 1px solid var(--border);
+    }
 
-  .ingredients-table thead th:last-child {
-    border-radius: 10px 0 0 0;
-  }
+    .author-img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--primary);
+    }
 
-  .ingredients-table tbody tr {
-    border-bottom: 1px solid #2a2535;
-    transition: background .2s;
-  }
+    .author-info h4 {
+        margin: 0;
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: #fff;
+    }
 
-  .ingredients-table tbody tr:hover {
-    background: #221f2a;
-  }
+    .author-info span {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
 
-  .ingredients-table tbody tr:last-child {
-    border-bottom: none;
-  }
+    .action-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 40px;
+    }
 
-  .ingredients-table td {
-    padding: 11px 16px;
-    color: #d0c4b0;
-  }
+    .action-btn {
+        width: 55px;
+        height: 55px;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: var(--bg-card);
+        color: var(--text-dim);
+    }
 
-  .ingredients-table td:first-child {
-    color: #fff;
-    font-weight: 600;
-  }
+    .action-btn.active {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+        border-color: #ef4444;
+    }
 
-  .ingredient-qty {
-    display: inline-block;
-    background: rgba(255, 140, 0, .15);
-    color: #ffb347;
-    padding: 3px 12px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: .87rem;
-  }
+    .action-btn:hover {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        transform: translateY(-3px);
+    }
 
-  /* ===== STEPS ===== */
-  .steps-list {
-    list-style: none;
-  }
+    .content-body {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 24px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 50px;
+    }
 
-  .step-item {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 18px;
-    padding: 16px;
-    background: #201d28;
-    border-radius: 14px;
-    border-right: 3px solid #ff8c00;
-    transition: transform .25s;
-  }
+    .section-title {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #fff;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
 
-  .step-item:hover {
-    transform: translateX(-4px);
-  }
+    .ingredients-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        background: var(--bg-card);
+        padding: 30px;
+        border-radius: 32px;
+        border: 1px solid var(--border);
+        max-width: 800px;
+    }
 
-  .step-num {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff8c00, #e6005a);
-    color: #fff;
-    font-weight: 900;
-    font-size: .9rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
+    .ingredient-item {
+        display: flex;
+        align-items: center;
+        background: var(--bg-main);
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        transition: all 0.2s;
+    }
 
-  .step-text {
-    color: #c8b89a;
-    line-height: 1.7;
-    padding-top: 4px;
-  }
+    .ingredient-item:hover {
+        border-color: var(--primary);
+    }
 
-  /* ===== SIDEBAR INGREDIENTS ===== */
-  .sidebar-ingredients {
-    background: #1a1720;
-    border: 1px solid #2a2535;
-    border-radius: 20px;
-    padding: 24px;
-    position: sticky;
-    top: 24px;
-  }
+    .ing-check-wrap {
+        padding: 0 20px;
+    }
 
-  .sidebar-ingredients h3 {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 18px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+    .ing-quantity-wrap {
+        background: rgba(99, 102, 241, 0.1);
+        padding: 15px 25px;
+        border-left: 1px solid var(--border);
+        min-width: 140px;
+        text-align: center;
+        color: var(--secondary);
+        font-weight: 900;
+        font-size: 1.1rem;
+    }
 
-  .ingredient-pill {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
-    border-radius: 10px;
-    background: #201d28;
-    margin-bottom: 8px;
-    border: 1px solid transparent;
-    transition: border-color .2s, transform .2s;
-  }
+    .ing-name-wrap {
+        padding: 15px 25px;
+        flex: 1;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
 
-  .ingredient-pill:hover {
-    border-color: #ff8c00;
-    transform: translateX(-3px);
-  }
+    .ing-label {
+        display: block;
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        margin-bottom: 2px;
+        font-weight: 800;
+    }
 
-  .pill-name {
-    color: #e8e0d5;
-    font-weight: 600;
-    font-size: .9rem;
-  }
+    .check-box {
+        width: 26px;
+        height: 26px;
+        border: 2px solid var(--primary);
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
 
-  .pill-qty {
-    color: #ffb347;
-    font-size: .82rem;
-    font-weight: 700;
-  }
+    .check-box.checked {
+        background: var(--primary);
+    }
 
-  /* ===== COMMENTS ===== */
-  .comment-box {
-    background: #1e1b26;
-    border: 1px solid #2e2b3a;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
-    transition: border-color .3s;
-  }
+    .check-box.checked::after {
+        content: '✓';
+        color: white;
+        font-weight: 900;
+        font-size: 1rem;
+    }
 
-  .comment-box:hover {
-    border-color: #4a4060;
-  }
+    .steps-container {
+        background: var(--bg-card);
+        padding: 45px;
+        border-radius: 32px;
+        border: 1px solid var(--border);
+    }
 
-  .comment-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
-  }
+    .method-text {
+        line-height: 1.8;
+        font-size: 1.15rem;
+        color: var(--text-dim);
+        white-space: pre-line;
+    }
 
-  .avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff8c00, #e6005a);
-    color: #fff;
-    font-weight: 900;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
+    .serving-adjuster {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: var(--bg-main);
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-weight: 800;
+        border: 1px solid var(--border);
+    }
 
-  .comment-user {
-    font-weight: 700;
-    color: #fff;
-    font-size: .95rem;
-  }
+    .adj-btn {
+        width: 32px;
+        height: 32px;
+        background: var(--bg-card);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        color: #fff;
+    }
 
-  .comment-date {
-    font-size: .78rem;
-    color: #7a7085;
-  }
-
-  .comment-text {
-    color: #b8a898;
-    line-height: 1.7;
-    font-size: .95rem;
-  }
-
-  .replies-list {
-    margin-top: 14px;
-    padding-right: 20px;
-    border-right: 2px solid #2e2b3a;
-  }
-
-  .reply-box {
-    background: #161320;
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-  }
-
-  .reply-box .avatar {
-    width: 34px;
-    height: 34px;
-    font-size: .82rem;
-    background: linear-gradient(135deg, #007aff, #a000e6);
-  }
-
-  /* ===== COMMENT FORM ===== */
-  .comment-form textarea {
-    width: 100%;
-    background: #201d28;
-    border: 1px solid #3a3545;
-    border-radius: 12px;
-    color: #e8e0d5;
-    font-family: 'Cairo', sans-serif;
-    font-size: .95rem;
-    padding: 14px 16px;
-    resize: vertical;
-    min-height: 100px;
-    outline: none;
-    transition: border-color .3s;
-  }
-
-  .comment-form textarea:focus {
-    border-color: #ff8c00;
-  }
-
-  .comment-form textarea::placeholder {
-    color: #5a5068;
-  }
-
-  .btn-submit {
-    margin-top: 12px;
-    background: linear-gradient(90deg, #ff8c00, #e6005a);
-    color: #fff;
-    border: none;
-    padding: 12px 32px;
-    border-radius: 30px;
-    font-family: 'Cairo', sans-serif;
-    font-size: .95rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity .3s, transform .2s;
-  }
-
-  .btn-submit:hover {
-    opacity: .88;
-    transform: translateY(-2px);
-  }
+    .stars {
+        display: flex;
+        gap: 6px;
+        color: #fbbf24;
+        font-size: 1.6rem;
+        margin-bottom: 25px;
+    }
 </style>
 
-<div class="recipe-page">
-
-  <!-- HERO -->
-  <div class="recipe-hero">
-    <div style="margin-bottom: 10px;">
-      <span class="hero-badge">🍽️ {{ recipe.category }}</span>
-    </div>
-    <h1>{{ recipe.name }}</h1>
-    <p class="summary">{{ recipe.summary }}</p>
-
-    <!-- Star Rating -->
-    <style>
-      .stars-container {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        direction: ltr;
-        margin-top: 15px;
-        position: relative;
-        z-index: 20;
-      }
-
-      .star-label {
-        font-size: 2.5rem;
-        cursor: pointer;
-        color: #3a3545;
-        transition: transform 0.2s, color 0.2s;
-        display: inline-block;
-        line-height: 1;
-      }
-
-      .star-label:hover {
-        transform: scale(1.2);
-        color: #ffb347 !important;
-      }
-
-      /* Hovering a star also colors stars to its left (since it's LTR) */
-      .star-label:hover~.star-label {
-        color: #ffb347 !important;
-      }
-
-      .star-input:checked~.star-label {
-        color: #ffb347;
-      }
-    </style>
-    <div class="rating-stars" style="position: relative; z-index: 20;">
-      <p style="color: #c8b89a; font-size: 0.9rem; margin-bottom: 5px;">تقييمك لهذه الوصفة:</p>
-      <form action="{% url 'rate_recipe' recipe.id %}" method="POST" id="rating-form">
-        {% csrf_token %}
-        <div class="stars-container">
-          {% with rating=recipe.user_rating|default:0|add:"0" %}
-          <input type="radio" name="rating" value="5" id="star5" class="star-input" style="position: absolute; opacity: 0;" {% if rating == 5 %}checked{% endif %} onchange="this.form.submit()"> <!-- ضروري ترك مسافات حول == -->
-          <label for="star5" class="star-label" style="{% if rating >= 5 %}color: #ffb347;{% endif %}">★</label>
-
-          <input type="radio" name="rating" value="4" id="star4" class="star-input" style="position: absolute; opacity: 0;" {% if rating == 4 %}checked{% endif %} onchange="this.form.submit()"> <!-- ضروري ترك مسافات حول == -->
-          <label for="star4" class="star-label" style="{% if rating >= 4 %}color: #ffb347;{% endif %}">★</label>
-
-          <input type="radio" name="rating" value="3" id="star3" class="star-input" style="position: absolute; opacity: 0;" {% if rating == 3 %}checked{% endif %} onchange="this.form.submit()"> <!-- ضروري ترك مسافات حول == -->
-          <label for="star3" class="star-label" style="{% if rating >= 3 %}color: #ffb347;{% endif %}">★</label>
-
-          <input type="radio" name="rating" value="2" id="star2" class="star-input" style="display: none;" {% if rating == 2 %}checked{% endif %} onchange="this.form.submit()"> <!-- ضروري ترك مسافات حول == -->
-          <label for="star2" class="star-label" style="{% if rating >= 2 %}color: #ffb347;{% endif %}">★</label>
-
-          <input type="radio" name="rating" value="1" id="star1" class="star-input" style="display: none;" {% if rating == 1 %}checked{% endif %} onchange="this.form.submit()"> <!-- ضروري ترك مسافات حول == -->
-          <label for="star1" class="star-label" style="{% if rating >= 1 %}color: #ffb347;{% endif %}">★</label>
-          {% endwith %}
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- HERO IMAGE (if available) -->
-  {% if recipe.image %}
-  <div class="hero-image-wrap">
-    <img src="{{ recipe.image }}" alt="{{ recipe.name }}">
-  </div>
-  {% endif %}
-
-  <!-- META STRIP -->
-  <div class="meta-strip">
-    <div class="meta-card">
-      <span class="meta-icon">⏱️</span>
-      <div class="meta-info">
-        <span class="meta-label">وقت التحضير</span>
-        <span class="meta-value">{{ recipe.prep_time }}</span>
-      </div>
-    </div>
-    <div class="meta-card">
-      <span class="meta-icon">🔥</span>
-      <div class="meta-info">
-        <span class="meta-label">وقت الطهي</span>
-        <span class="meta-value">{{ recipe.cooking_time }}</span>
-      </div>
-    </div>
-    <div class="meta-card">
-      <span class="meta-icon">👥</span>
-      <div class="meta-info">
-        <span class="meta-label">عدد الأشخاص</span>
-        <span class="meta-value">{{ recipe.servings }}</span>
-      </div>
-    </div>
-    <div class="meta-card">
-      <span class="meta-icon">📊</span>
-      <div class="meta-info">
-        <span class="meta-label">الصعوبة</span>
-        <span class="meta-value">{{ recipe.difficulty }}</span>
-      </div>
-    </div>
-    <!-- Favorite Button as Card -->
-    <form action="{% url 'toggle_favorite' recipe.id %}" method="POST" style="display: contents;">
-      {% csrf_token %}
-      <button type="submit" class="meta-card"
-        style="background: #1e1b24; border: 1px solid #2e2b38; cursor: pointer; text-align: right; transition: all 0.3s; flex: 1; max-width: 180px; font-family: 'Cairo';">
-        <span class="meta-icon" style="font-size: 1.5rem;">{% if recipe.is_favorite %}❤️{% else %}🤍{% endif %}</span>
-        <div class="meta-info">
-          <span class="meta-label">المفضلة</span>
-          <span class="meta-value" style="color: {% if recipe.is_favorite %}#ff4757{% else %}#ffe0a0{% endif %}; font-size: 0.85rem;">
-            {% if recipe.is_favorite %}تم الحفظ{% else %}إضافة{% endif %}
-          </span>
-        </div>
-      </button>
-    </form>
-  </div>
-
-  <!-- BODY GRID -->
-  <div class="recipe-body">
-
-    <!-- MAIN COLUMN -->
-    <div>
-
-      <!-- INGREDIENTS TABLE (optional) -->
-      {% if recipe.show_table %}
-      <div class="section-card">
-        <div class="section-title">
-          <span class="icon-circle orange-circle">🧂</span>
-          المكونات
-        </div>
-        <table class="ingredients-table">
-          <thead>
-            <tr>
-              <th>اسم المكون</th>
-              <th>المقدار</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for ing in recipe.ingredients %}
-            <tr>
-              <td>{{ ing.name }}</td>
-              <td><span class="ingredient-qty">{{ ing.amount }}</span></td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% endif %}
-
-      <!-- STEPS -->
-      <div class="section-card">
-        <div class="section-title">
-          <span class="icon-circle pink-circle">📋</span>
-          شرح الوصفة
-        </div>
-        <ul class="steps-list">
-          {% for step in recipe.instructions %}
-          <li class="step-item">
-            <span class="step-num">{{ forloop.counter }}</span>
-            <p class="step-text">{{ step }}</p>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <!-- COMMENTS -->
-      <div class="section-card">
-        <div class="section-title">
-          <span class="icon-circle blue-circle">💬</span>
-          التعليقات ({{ recipe.comments|length }})
-        </div>
-
-        {% for comment in recipe.comments %}
-        <div class="comment-box">
-          <div class="comment-header">
-            <div class="avatar">{{ comment.avatar }}</div>
-            <div>
-              <div class="comment-user">{{ comment.user }}</div>
-              <div class="comment-date">{{ comment.date }}</div>
-            </div>
-          </div>
-          <p class="comment-text">{{ comment.text }}</p>
-
-          <button onclick="document.getElementById('reply-form-{{ forloop.counter0 }}').style.display='block'"
-            style="background:none; border:none; color:#ff8c00; font-size:0.85rem; cursor:pointer; margin-top:8px; font-family:'Cairo';">رد
-            على التعليق</button>
-
-          <div id="reply-form-{{ forloop.counter0 }}" style="display:none; margin-top:10px;">
-            <form action="{% url 'add_reply' recipe.id forloop.counter0 %}" method="POST">
-              {% csrf_token %}
-              <textarea name="reply" placeholder="اكتب ردك هنا..."
-                style="width:100%; background:#161320; border:1px solid #3a3545; border-radius:8px; color:#e8e0d5; padding:10px; font-family:'Cairo'; font-size:0.9rem; min-height:60px;"></textarea>
-              <button type="submit" class="btn-submit"
-                style="padding: 6px 20px; font-size: 0.85rem; margin-top: 5px;">إرسال الرد</button>
-            </form>
-          </div>
-
-          {% if comment.replies %}
-          <div class="replies-list">
-            {% for reply in comment.replies %}
-            <div class="reply-box">
-              <div class="comment-header">
-                <div class="avatar">{{ reply.avatar }}</div>
-                <div>
-                  <div class="comment-user">{{ reply.user }}</div>
-                  <div class="comment-date">{{ reply.date }}</div>
+<div class="recipe-detail-container">
+    <div class="recipe-header">
+        <div class="header-content">
+            <span class="recipe-cat">{{ recipe.category.name }}</span>
+            <h1 class="recipe-title">{{ recipe.title }}</h1>
+            
+            <form action="{% url 'rate_recipe' recipe.id %}" method="POST" id="starForm">
+                {% csrf_token %}
+                <input type="hidden" name="rating" id="ratingValue">
+                <div class="stars">
+                    {% for i in "12345" %}
+                    <span class="star-btn" style="cursor:pointer; {% if avg_rating >= forloop.counter|add:0 %}color:#fbbf24;{% else %}color:var(--border);{% endif %}" onclick="submitRate({{ forloop.counter }})">★</span>
+                    {% endfor %}
+                    <span style="color: var(--text-dim); font-size: 0.95rem; margin-right: 12px; font-weight: 700;">({{ rating_count }} تقييم)</span>
                 </div>
-              </div>
-              <p class="comment-text">{{ reply.text }}</p>
+            </form>
+
+            <div class="meta-grid">
+                <div class="meta-box">
+                    <span class="meta-label">وقت الطبخ</span>
+                    <span class="meta-value">🕒 {{ recipe.cook_time }} دقيقة</span>
+                </div>
+                <div class="meta-box">
+                    <span class="meta-label">المطبخ</span>
+                    <span class="meta-value">🌐 {{ recipe.cuisine|default:"المطبخ العام" }}</span>
+                </div>
+                <div class="meta-box">
+                    <span class="meta-label">درجة الصعوبة</span>
+                    <span class="meta-value">
+                        {% if recipe.difficulty == 'easy' or recipe.difficulty == 'سهل' %}🟢 سهل{% elif recipe.difficulty == 'medium' or recipe.difficulty == 'متوسط' %}🟡 متوسط{% else %}🔴 صعب{% endif %}
+                    </span>
+                </div>
+                <div class="meta-box">
+                    <span class="meta-label">الحصة</span>
+                    <span class="meta-value">👥 تكفي {{ recipe.servings }} أشخاص</span>
+                </div>
             </div>
-            {% endfor %}
-          </div>
-          {% endif %}
-        </div>
-        {% endfor %}
 
-        <!-- Comment Form -->
-        <div class="comment-form" style="margin-top:24px;">
-          <div class="section-title" style="border-bottom:none; margin-bottom:14px;">
-            <span class="icon-circle green-circle">✏️</span>
-            أضف تعليقاً
-          </div>
-          <form action="{% url 'add_comment' recipe.id %}" method="POST">
-            {% csrf_token %}
-            <textarea name="comment" placeholder="اكتب تعليقك هنا..." required></textarea>
-            <button type="submit" class="btn-submit">إرسال التعليق</button>
-          </form>
-        </div>
-      </div>
+            <div class="author-section">
+                {% if recipe.author.profile_picture %}
+                <img src="{{ recipe.author.profile_picture.url }}" class="author-img" alt="{{ recipe.author.username }}">
+                {% else %}
+                <div style="width:60px; height:60px; border-radius:50%; background:var(--bg-main); display:flex; align-items:center; justify-content:center; font-size:1.8rem; border: 2px solid var(--primary);">👨‍🍳</div>
+                {% endif %}
+                <div class="author-info">
+                    <h4>{{ recipe.author.username }}</h4>
+                    <span>مؤلف الوصفة • خبرة {{ recipe.author.experience_years }} سنوات</span>
+                </div>
+            </div>
 
-    </div><!-- end main col -->
-
-    <!-- SIDEBAR -->
-    <div>
-      <div class="sidebar-ingredients">
-        <h3>🛒 قائمة المكونات</h3>
-        {% for ing in recipe.ingredients %}
-        <div class="ingredient-pill">
-          <span class="pill-name">{{ ing.name }}</span>
-          <span class="pill-qty">{{ ing.amount }}</span>
+            <div class="action-row">
+                <form action="{% url 'toggle_like' recipe.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn {% if is_liked %}active{% endif %}" title="إعجاب">🧡</button>
+                </form>
+                <form action="{% url 'toggle_favorite' recipe.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn {% if is_favorite %}active{% endif %}" style="color: {% if is_favorite %}#fbbf24{% else %}var(--text-dim){% endif %}; border-color: {% if is_favorite %}#fbbf24{% else %}var(--border){% endif %}; background: {% if is_favorite %}rgba(251, 191, 36, 0.1){% else %}var(--bg-card){% endif %};" title="حفظ">🔖</button>
+                </form>
+                <div class="action-btn" onclick="window.print()" title="طباعة">🖨️</div>
+            </div>
         </div>
-        {% endfor %}
-      </div>
+
+        <div class="header-image">
+            {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+            {% else %}
+            <div style="width:100%; height:100%; background:var(--bg-card); display:flex; align-items:center; justify-content:center; font-size:6rem;">🍲</div>
+            {% endif %}
+        </div>
     </div>
 
-  </div><!-- end grid -->
+    <div class="content-body">
+        <div class="ingredients-section">
+            <div class="section-title">
+                المكونات
+                <div class="serving-adjuster">
+                    <div class="adj-btn">-</div>
+                    <span>{{ recipe.servings }} أشخاص</span>
+                    <div class="adj-btn">+</div>
+                </div>
+            </div>
+            <div class="ingredients-grid">
+                {% for ingredient in recipe.ingredients.all %}
+                <div class="ingredient-item">
+                    <div class="ing-check-wrap">
+                        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+                    </div>
+                    <div class="ing-quantity-wrap">
+                        <span class="ing-label">المقدار</span>
+                        {{ ingredient.quantity }}
+                    </div>
+                    <div class="ing-name-wrap">
+                        <span class="ing-label">المكون</span>
+                        {{ ingredient.name }}
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: var(--text-dim);">لا توجد مكونات مضافة.</p>
+                {% endfor %}
+            </div>
+        </div>
 
-</div><!-- end recipe-page -->
+        <div class="method-section">
+            <h2 class="section-title">طريقة التحضير</h2>
+            <div class="steps-container">
+                <p class="method-text">{{ recipe.description }}</p>
+                
+                {% for step in recipe.steps.all %}
+                <div style="margin-bottom: 40px; padding-top: 30px; border-top: 1px solid var(--border);">
+                    <h3 style="font-weight: 900; color: var(--primary); margin-bottom: 15px;">الخطوة {{ step.order }}</h3>
+                    <p class="method-text">{{ step.description }}</p>
+                    {% if step.image %}
+                    <img src="{{ step.image.url }}" style="max-width: 100%; border-radius: 24px; margin-top: 20px; border: 1px solid var(--border);">
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="comments-section">
+            <h2 class="section-title">التعليقات والردود</h2>
+            <div class="steps-container">
+                {% for comment in comments %}
+                <div style="margin-bottom: 40px; padding: 25px; border-bottom: 1px solid var(--border);">
+                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 15px;">
+                        <strong style="color:var(--primary); font-size: 1.1rem;">{{ comment.user.username }}</strong>
+                        <span style="font-size: 0.85rem; color: var(--text-dim);">{{ comment.created_at|date:"Y/m/d" }}</span>
+                    </div>
+                    <p style="color: var(--text-main); font-size: 1.05rem;">{{ comment.text }}</p>
+                    
+                    {% for reply in comment.replies.all %}
+                    <div style="margin-right: 40px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 16px; margin-top: 15px; border-right: 4px solid var(--primary);">
+                        <strong style="color:var(--secondary);">رد:</strong> {{ reply.text }}
+                    </div>
+                    {% endfor %}
+
+                    {% if user.is_authenticated %}
+                    <button onclick="document.getElementById('reply-box-{{comment.id}}').style.display='block'" style="background:none; border:none; color:var(--secondary); cursor:pointer; margin-top:12px; font-size: 0.9rem; font-weight:800;">↩️ أضف رداً</button>
+                    <div id="reply-box-{{comment.id}}" style="display:none; margin-top:15px;">
+                        <form action="{% url 'add_reply' recipe.id comment.id %}" method="POST">
+                            {% csrf_token %}
+                            <div style="display:flex; gap:12px;">
+                                <input type="text" name="reply" style="flex:1; background:var(--bg-main); border:1px solid var(--border); color:#fff; padding:12px; border-radius:12px; font-family:'Cairo';" placeholder="اكتب ردك..." required>
+                                <button type="submit" style="background:var(--primary); color:#fff; border:none; padding:12px 25px; border-radius:12px; font-weight:800; cursor:pointer;">رد</button>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p style="color: var(--text-dim);">لا توجد تعليقات بعد.</p>
+                {% endfor %}
+
+                {% if user.is_authenticated %}
+                <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid var(--border);">
+                    <h3 style="font-weight: 900; margin-bottom: 25px;">أضف تعليقك ✨</h3>
+                    <form action="{% url 'add_comment' recipe.id %}" method="POST">
+                        {% csrf_token %}
+                        <textarea name="comment" style="width:100%; background:var(--bg-main); border:1px solid var(--border); color:#fff; padding:20px; border-radius:20px; font-family:'Cairo';" rows="5" placeholder="ما رأيك في هذه الوصفة؟" required></textarea>
+                        <button type="submit" style="width:100%; background:var(--primary); color:#fff; border:none; padding:18px; border-radius:16px; font-weight:900; cursor:pointer; margin-top: 15px; font-size: 1.1rem;">نشر التعليق</button>
+                    </form>
+                </div>
+                {% else %}
+                <div style="text-align:center; padding:40px; background:rgba(255,255,255,0.02); border-radius:24px; margin-top:40px; border: 1px dashed var(--border);">
+                    <p style="color:var(--text-dim); margin-bottom:20px;">يجب عليك تسجيل الدخول للمشاركة في التعليقات</p>
+                    <a href="{% url 'login' %}" style="background:var(--primary); color:#fff; padding:12px 40px; border-radius:12px; text-decoration:none; font-weight:900;">تسجيل الدخول 🔐</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  function submitRate(v) {
+    document.getElementById('ratingValue').value = v;
+    document.getElementById('starForm').submit();
+  }
+</script>
 {% endblock %}

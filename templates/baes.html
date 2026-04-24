@@ -4,63 +4,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}منصةمشاركةالوصفات{% endblock %}</title>
+    <title>{% block title %}PlatEeat - منصة مشاركة الوصفات{% endblock %}</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #818cf8;
+            --secondary: #0ea5e9;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: #334155;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── NAVBAR ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
         }
 
         nav {
-            background-color: #110e4b;
-            color: white;
-            padding: 10px;
-            font-size: x-large;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         nav ul {
-            list-style-type: none;
-            margin: 4px;
-            padding: 10px;
+            list-style: none;
             display: flex;
-        }
-
-        nav li {
-            margin: 0 30px;
+            gap: 25px;
+            align-items: center;
         }
 
         nav a {
-            color: white;
+            color: var(--text-main);
             text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.2s;
         }
 
-        nav a:hover {
-            text-decoration: underline;
+        nav a:hover { color: var(--primary-hover); }
+
+        .nav-btn {
+            background: var(--primary);
+            color: #fff !important;
+            padding: 10px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.4);
+            transition: all 0.3s;
         }
 
-        .container {
-            padding: 20px;
+        .nav-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
         }
+
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171 !important;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+        .logout-btn:hover { background: #ef4444; color: #fff !important; }
+
+        .fav-link {
+            color: #fbbf24 !important;
+            margin-left: 15px;
+            font-size: 0.9rem;
+        }
+
+        .login-link {
+            color: var(--primary-hover);
+            border: 1.5px solid var(--primary-hover);
+            padding: 8px 20px;
+            border-radius: 12px;
+        }
+
+        .user-greet {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        /* ── MESSAGES ── */
+        .messages-container {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            width: 90%;
+            max-width: 500px;
+        }
+        .alert {
+            padding: 16px 24px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: slideInDown 0.5s ease-out;
+        }
+        .alert-success { background: #10b981; color: #fff; }
+        .alert-error, .alert-danger { background: #ef4444; color: #fff; }
+        .alert-info { background: #3b82f6; color: #fff; }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── CONTAINER ── */
+        .main-content { min-height: calc(100vh - 80px); }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #0b1120;
+            padding: 60px 24px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        @media (max-width: 768px) { nav ul { display: none; } }
+
+        /* ── GLOBAL ANIMATIONS ── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fadeInUp 0.6s ease-out forwards; }
     </style>
 </head>
 
 <body>
-    <nav>
-        <ul>
-            <li>غير اكلان مافيش</li>
-            <li><a href="{% url 'home' %}">الرئيسية</a></li>
-            <li><a href="{% url 'recipes' %}">الوصفات</a></li>
-            <li><a href="{% url 'favorites' %}">المفضلة</a></li>
-            <li><a href="{% url 'about' %}">من نحن</a></li>
-            <li><a href="{% url 'contact' %}">تواصل بنا</a></li>
-            <li><a href="{% url 'login' %}">تسجيل الدخول</a></li>
-            <li><a href="{% url 'register' %}">حساب جديد</a></li>
-        </ul>
-    </nav>
-    <div class="container">
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(a => {
+                a.style.transition = 'opacity 0.5s';
+                a.style.opacity = '0';
+                setTimeout(() => a.remove(), 500);
+            });
+        }, 3500);
+    </script>
+    {% endif %}
+
+    <header>
+        <nav>
+            <a href="{% url 'home' %}" class="logo">PlatEeat 🍽️</a>
+            <ul>
+                <li><a href="{% url 'home' %}">الرئيسية</a></li>
+                <li><a href="{% url 'recipes' %}">الوصفات</a></li>
+                <li><a href="{% url 'about' %}">من نحن</a></li>
+                <li><a href="{% url 'contact' %}">تواصل بنا</a></li>
+            </ul>
+            <ul>
+                {% if user.is_authenticated %}
+                    <span class="user-greet">مرحباً، {{ user.username }}</span>
+                    <li><a href="{% url 'favorites' %}" class="fav-link">⭐ المفضلات</a></li>
+                    <li><a href="{% url 'logout' %}" class="logout-btn">خروج</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}" class="login-link">دخول</a></li>
+                    <li><a href="{% url 'register' %}" class="nav-btn">حساب جديد</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-content">
         {% block content %}{% endblock %}
     </div>
+
+    <footer>
+        <p>&copy; 2026 PlatEeat - جميع الحقوق محفوظة. صُمم بكل شغف لمحبي الطبخ.</p>
+    </footer>
 </body>
 
 </html>

@@ -1,12 +1,218 @@
-﻿{% extends 'baes.html' %}
+{% extends 'baes.html' %}
 
-{% block title %}إنشاء حساب جديد - منصة الأكل{% endblock %}
+{% block title %}إنشاء حساب جديد - PlatEeat{% endblock %}
 
 {% block content %}
-<h1>إنشاء حساب جديد</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">إنشاء الحساب</button>
-</form>
+<style>
+    .auth-page {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 150px);
+        padding: 60px 24px;
+        background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.1), transparent),
+            radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.1), transparent);
+    }
+
+    .auth-card {
+        background: #1e293b;
+        width: 100%;
+        max-width: 500px;
+        padding: 50px;
+        border-radius: 32px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        border: 1px solid #334155;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(90deg, #0ea5e9, #6366f1);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .auth-header h1 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: #fff;
+        margin-bottom: 10px;
+    }
+
+    .auth-header p {
+        color: #94a3b8;
+        font-size: 1rem;
+    }
+
+    /* ── FORM STYLING ── */
+    form .form-group {
+        margin-bottom: 25px;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #cbd5e1;
+    }
+
+    form input,
+    form select,
+    form textarea {
+        width: 100%;
+        padding: 16px 20px;
+        background: #0f172a;
+        border: 2px solid #334155;
+        border-radius: 16px;
+        color: #fff;
+        font-family: 'Cairo';
+        font-size: 1rem;
+        outline: none;
+        transition: all 0.3s;
+    }
+
+    form input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        background: #1e293b;
+    }
+
+    .helptext,
+    .help-block {
+        display: block;
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 8px;
+        line-height: 1.5;
+    }
+
+    .errorlist {
+        list-style: none;
+        color: #fca5a5;
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+        padding: 12px;
+        background: rgba(153, 27, 27, 0.2);
+        border-radius: 12px;
+        border: 1px solid rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-auth {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(90deg, #0ea5e9, #6366f1);
+        color: #fff;
+        border: none;
+        border-radius: 16px;
+        font-family: 'Cairo';
+        font-size: 1.2rem;
+        font-weight: 900;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-auth:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.5);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 1px solid #334155;
+        font-size: 0.95rem;
+        color: #94a3b8;
+    }
+
+    .auth-footer a {
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    /* ── ANIMATIONS ── */
+    .animate-card {
+        animation: cardEnter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes cardEnter {
+        from {
+            opacity: 0;
+            transform: scale(0.9) translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+</style>
+
+<div class="auth-page">
+    <div class="auth-card animate-card">
+        <div class="auth-header">
+            <h1>انضم إلينا الآن ✨</h1>
+            <p>ابدأ رحلتك في عالم النكهات وشارك وصفاتك الخاصة مع الآلاف</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="error-container">
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">
+                    {% if field.name == 'username' %}اسم المستخدم
+                    {% elif field.name == 'email' %}البريد الإلكتروني (اختياري)
+                    {% elif field.name == 'first_name' %}الاسم الأول
+                    {% elif field.name == 'last_name' %}اسم العائلة
+                    {% elif field.name == 'bio' %}نبذة تعريفية عنك
+                    {% elif field.name == 'password1' %}كلمة المرور
+                    {% elif field.name == 'password2' %}تأكيد كلمة المرور
+                    {% else %}{{ field.label }}{% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                <span class="helptext">{{ field.help_text|safe }}</span>
+                {% endif %}
+                {% if field.errors %}
+                <div class="errorlist">
+                    {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-auth">إنشاء حسابي مجاناً 🚀</button>
+        </form>
+
+        <div class="auth-footer">
+            لديك حساب بالفعل؟ <a href="{% url 'login' %}">سجل دخولك من هنا</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

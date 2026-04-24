@@ -1,255 +1,168 @@
 {% extends 'baes.html' %}
-{% block title %}إضافة وصفة جديدة - منصة الأكل{% endblock %}
+{% block title %}إضافة وصفة جديدة - PlatEeat{% endblock %}
 
 {% block content %}
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
 
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
   .add-page {
     font-family: 'Cairo', sans-serif;
-    background: #0a0810;
+    background: #0f172a;
     min-height: 100vh;
     direction: rtl;
-    padding-bottom: 80px;
+    padding-bottom: 100px;
+    color: #f8fafc;
   }
 
   /* ── HERO HEADER ── */
   .add-hero {
-    background: linear-gradient(135deg, #1a0030 0%, #0d001a 40%, #001a2e 100%);
-    padding: 60px 24px 70px;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    padding: 80px 24px 100px;
     text-align: center;
     position: relative;
-    overflow: hidden;
-  }
-
-  .add-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(130, 0, 255, .3) 0%, transparent 65%),
-      radial-gradient(ellipse 50% 40% at 90% 90%, rgba(0, 180, 255, .15) 0%, transparent 60%);
+    border-bottom: 1px solid #334155;
   }
 
   .add-hero .badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: linear-gradient(90deg, #7c00ff, #00b4ff);
-    color: #fff;
+    background: rgba(99, 102, 241, 0.1);
+    color: #818cf8;
     font-size: .85rem;
-    font-weight: 700;
-    padding: 7px 22px;
+    font-weight: 800;
+    padding: 8px 24px;
     border-radius: 30px;
-    margin-bottom: 20px;
-    position: relative;
-    box-shadow: 0 4px 20px rgba(124, 0, 255, .4);
+    margin-bottom: 24px;
+    border: 1.5px solid rgba(99, 102, 241, 0.2);
   }
 
   .add-hero h1 {
-    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
     font-weight: 900;
-    background: linear-gradient(135deg, #fff 0%, #bf80ff 50%, #00d4ff 100%);
+    background: linear-gradient(135deg, #6366f1, #0ea5e9);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 14px;
-    position: relative;
+    margin-bottom: 15px;
   }
 
   .add-hero p {
-    color: #a090c0;
-    font-size: 1.05rem;
-    position: relative;
-  }
-
-  /* ── DRAFT BANNER ── */
-  .draft-banner {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    background: rgba(0, 230, 118, .1);
-    border: 1px solid rgba(0, 230, 118, .3);
-    border-radius: 12px;
-    padding: 12px 20px;
-    margin-bottom: 20px;
-    color: #00e676;
-    font-size: .9rem;
-    font-weight: 700;
-  }
-
-  .draft-banner.visible {
-    display: flex;
-  }
-
-  .draft-banner .clear-btn {
-    margin-right: auto;
-    background: rgba(255, 60, 60, .15);
-    border: 1px solid rgba(255, 60, 60, .3);
-    color: #ff6060;
-    border-radius: 8px;
-    padding: 4px 14px;
-    font-family: 'Cairo', sans-serif;
-    font-size: .82rem;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .draft-banner .clear-btn:hover {
-    background: rgba(255, 60, 60, .3);
+    color: #94a3b8;
+    font-size: 1.15rem;
   }
 
   /* ── FORM WRAPPER ── */
   .form-wrap {
-    max-width: 860px;
-    margin: -30px auto 0;
-    padding: 0 20px;
+    max-width: 900px;
+    margin: -60px auto 0;
+    padding: 0 24px;
     position: relative;
-    z-index: 2;
+    z-index: 10;
   }
 
   /* ── SECTION CARD ── */
   .form-section {
-    background: #12101a;
-    border: 1px solid #2a2040;
-    border-radius: 22px;
-    padding: 32px 30px;
-    margin-bottom: 24px;
-    transition: border-color .3s, box-shadow .3s;
-  }
-
-  .form-section:hover {
-    border-color: #5a3080;
-    box-shadow: 0 0 30px rgba(100, 0, 200, .1);
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 32px;
+    padding: 40px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
 
   .section-head {
     display: flex;
     align-items: center;
-    gap: 14px;
-    margin-bottom: 26px;
-    padding-bottom: 16px;
-    border-bottom: 2px solid #201830;
+    gap: 15px;
+    margin-bottom: 35px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #334155;
   }
 
   .section-head .icon-orb {
-    width: 46px;
-    height: 46px;
+    width: 50px;
+    height: 50px;
     border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
-    flex-shrink: 0;
+    font-size: 1.4rem;
+    color: #fff;
   }
 
   .orb-purple {
-    background: linear-gradient(135deg, #7c00ff, #4a00b0);
-    box-shadow: 0 4px 14px rgba(124, 0, 255, .4);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
   }
 
   .orb-cyan {
-    background: linear-gradient(135deg, #00b4ff, #0060cc);
-    box-shadow: 0 4px 14px rgba(0, 180, 255, .4);
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
   }
 
   .orb-orange {
-    background: linear-gradient(135deg, #ff8c00, #cc4400);
-    box-shadow: 0 4px 14px rgba(255, 140, 0, .4);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
   }
 
   .orb-pink {
-    background: linear-gradient(135deg, #ff0080, #aa0055);
-    box-shadow: 0 4px 14px rgba(255, 0, 128, .4);
+    background: linear-gradient(135deg, #ec4899, #be185d);
   }
 
   .orb-green {
-    background: linear-gradient(135deg, #00e676, #00994d);
-    box-shadow: 0 4px 14px rgba(0, 230, 118, .4);
-  }
-
-  .orb-teal {
-    background: linear-gradient(135deg, #00e5ff, #006080);
-    box-shadow: 0 4px 14px rgba(0, 229, 255, .4);
+    background: linear-gradient(135deg, #10b981, #059669);
   }
 
   .section-head h2 {
-    font-size: 1.3rem;
-    font-weight: 800;
+    font-size: 1.5rem;
+    font-weight: 900;
     color: #fff;
   }
 
   .section-head span {
-    font-size: .82rem;
-    color: #7060a0;
-    margin-top: 2px;
-    display: block;
+    font-size: .85rem;
+    color: #64748b;
+    font-weight: 600;
+    margin-top: 3px;
   }
 
   /* ── FORM FIELDS ── */
   .field-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
   }
 
   .field-group label {
     display: block;
-    font-size: .88rem;
-    font-weight: 700;
-    color: #b090e0;
-    margin-bottom: 8px;
-    letter-spacing: .3px;
+    font-size: .95rem;
+    font-weight: 800;
+    color: #cbd5e1;
+    margin-bottom: 10px;
   }
 
   .field-group input,
   .field-group textarea,
   .field-group select {
     width: 100%;
-    background: #1c1828;
-    border: 1.5px solid #302448;
-    border-radius: 12px;
-    color: #e8e0ff;
-    font-family: 'Cairo', sans-serif;
+    background: #0f172a;
+    border: 2px solid #334155;
+    border-radius: 16px;
+    color: #fff;
+    font-family: 'Cairo';
     font-size: 1rem;
-    padding: 14px 18px;
+    padding: 16px 20px;
     outline: none;
-    transition: border-color .3s, box-shadow .3s, background .3s;
+    transition: all 0.3s;
   }
 
   .field-group input:focus,
   .field-group textarea:focus,
   .field-group select:focus {
-    border-color: #7c00ff;
-    box-shadow: 0 0 0 4px rgba(124, 0, 255, .18);
-    background: #20183a;
-  }
-
-  .field-group input::placeholder,
-  .field-group textarea::placeholder {
-    color: #4a3870;
-  }
-
-  .field-group textarea {
-    resize: vertical;
-    min-height: 110px;
-  }
-
-  .field-group select option {
-    background: #1c1828;
-    color: #e8e0ff;
+    border-color: #6366f1;
+    background: #1e293b;
+    box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.2);
   }
 
   .field-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 20px;
   }
 
   @media(max-width:600px) {
@@ -260,20 +173,19 @@
 
   /* ── IMAGE UPLOAD ── */
   .image-upload-zone {
-    border: 2px dashed #302448;
-    border-radius: 16px;
-    padding: 32px 20px;
+    border: 2px dashed #334155;
+    border-radius: 20px;
+    padding: 50px 20px;
     text-align: center;
     cursor: pointer;
-    transition: border-color .3s, background .3s;
+    transition: all 0.3s;
+    background: #0f172a;
     position: relative;
-    background: #16121f;
   }
 
-  .image-upload-zone:hover,
-  .image-upload-zone.dragover {
-    border-color: #00e5ff;
-    background: #0d1a20;
+  .image-upload-zone:hover {
+    border-color: #6366f1;
+    background: #1e293b;
   }
 
   .image-upload-zone input[type="file"] {
@@ -281,224 +193,99 @@
     inset: 0;
     opacity: 0;
     cursor: pointer;
-    width: 100%;
-    height: 100%;
   }
 
   .upload-icon {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
   }
 
   .upload-text {
-    color: #a090c0;
-    font-size: .95rem;
+    color: #94a3b8;
+    font-size: 1.05rem;
   }
 
   .upload-text strong {
-    color: #00e5ff;
+    color: #818cf8;
   }
 
-  .image-preview-wrap {
-    display: none;
-    margin-top: 16px;
-    border-radius: 12px;
-    overflow: hidden;
-    max-height: 280px;
-  }
-
-  .image-preview-wrap img {
-    width: 100%;
-    height: 280px;
-    object-fit: cover;
-    display: block;
-    border-radius: 12px;
-  }
-
-  .remove-img-btn {
-    margin-top: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 0, 80, .15);
-    border: 1px solid rgba(255, 0, 80, .3);
-    color: #ff4060;
-    border-radius: 8px;
-    padding: 6px 16px;
-    font-family: 'Cairo', sans-serif;
-    font-size: .85rem;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .remove-img-btn:hover {
-    background: rgba(255, 0, 80, .3);
-  }
-
-  /* ── INGREDIENTS DYNAMIC ── */
-  #ingredients-list {
-    margin-bottom: 16px;
-  }
-
+  /* ── INGREDIENTS ── */
   .ing-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 42px;
-    gap: 10px;
-    margin-bottom: 10px;
-    align-items: center;
-  }
-
-  .ing-row input {
-    background: #1c1828;
-    border: 1.5px solid #302448;
-    border-radius: 10px;
-    color: #e8e0ff;
-    font-family: 'Cairo', sans-serif;
-    font-size: .95rem;
-    padding: 11px 14px;
-    outline: none;
-    width: 100%;
-    transition: border-color .3s;
-  }
-
-  .ing-row input:focus {
-    border-color: #00b4ff;
+    grid-template-columns: 1fr 1fr 45px;
+    gap: 15px;
+    margin-bottom: 15px;
   }
 
   .btn-remove {
-    width: 38px;
-    height: 38px;
-    background: rgba(255, 0, 80, .15);
-    border: 1px solid rgba(255, 0, 80, .3);
-    border-radius: 10px;
-    color: #ff4060;
-    font-size: 1.1rem;
-    font-weight: 700;
+    width: 45px;
+    height: 45px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 12px;
+    color: #f87171;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background .2s;
-  }
-
-  .btn-remove:hover {
-    background: rgba(255, 0, 80, .3);
+    font-size: 1.2rem;
   }
 
   .btn-add-ing {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(0, 180, 255, .12);
-    border: 1.5px dashed rgba(0, 180, 255, .4);
-    border-radius: 12px;
-    color: #00b4ff;
-    font-family: 'Cairo', sans-serif;
-    font-size: .92rem;
-    font-weight: 700;
-    padding: 10px 22px;
+    gap: 10px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 2px dashed #6366f1;
+    border-radius: 16px;
+    color: #818cf8;
+    padding: 14px 30px;
+    font-weight: 800;
     cursor: pointer;
-    transition: background .3s, border-color .3s, transform .2s;
+    transition: all 0.3s;
   }
 
   .btn-add-ing:hover {
-    background: rgba(0, 180, 255, .22);
-    border-color: #00b4ff;
-    transform: translateY(-2px);
+    background: #6366f1;
+    color: #fff;
+    transform: translateY(-3px);
   }
 
   /* ── SUBMIT ── */
-  .submit-wrap {
-    text-align: center;
-    margin-top: 10px;
-  }
-
   .btn-submit {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    background: linear-gradient(90deg, #7c00ff, #00b4ff);
+    width: 100%;
+    background: linear-gradient(90deg, #6366f1, #0ea5e9);
     color: #fff;
     border: none;
-    padding: 18px 60px;
-    border-radius: 50px;
-    font-family: 'Cairo', sans-serif;
-    font-size: 1.15rem;
+    padding: 22px;
+    border-radius: 24px;
+    font-family: 'Cairo';
+    font-size: 1.3rem;
     font-weight: 900;
     cursor: pointer;
-    box-shadow: 0 8px 30px rgba(124, 0, 255, .5);
-    transition: opacity .3s, transform .3s, box-shadow .3s;
-    letter-spacing: .3px;
+    box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
   }
 
   .btn-submit:hover {
-    opacity: .9;
-    transform: translateY(-4px);
-    box-shadow: 0 14px 40px rgba(124, 0, 255, .6);
-  }
-
-  .btn-submit .arrow {
-    font-size: 1.3rem;
-  }
-
-  /* column headers for ingredients */
-  .ing-headers {
-    display: grid;
-    grid-template-columns: 1fr 1fr 42px;
-    gap: 10px;
-    margin-bottom: 6px;
-  }
-
-  .ing-headers span {
-    font-size: .8rem;
-    font-weight: 700;
-    color: #7060a0;
-    padding-right: 4px;
-  }
-
-  /* auto-save indicator */
-  .autosave-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #00e676;
-    margin-left: 6px;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-
-    0%,
-    100% {
-      opacity: 1;
-    }
-
-    50% {
-      opacity: .3;
-    }
+    transform: translateY(-5px);
+    box-shadow: 0 20px 45px rgba(99, 102, 241, 0.5);
   }
 </style>
 
 <div class="add-page">
-
-  <!-- HERO -->
-  <div class="add-hero">
-    <div class="badge">✨ وصفة جديدة</div>
-    <h1>أضف وصفتك الخاصة</h1>
-    <p>شارك إبداعك مع الجميع — أدخل تفاصيل وصفتك وشاهدها تتحول لصفحة رائعة</p>
+  <div class="add-hero animate-up">
+    <div class="badge">👨‍🍳 شاركنا إبداعك</div>
+    <h1>أضف وصفة جديدة</h1>
+    <p>حوّل وصفتك السرية إلى تحفة فنية يراها الجميع</p>
   </div>
 
-  <!-- FORM -->
-  <div class="form-wrap">
-
-    <!-- Draft restore banner -->
-    <div class="draft-banner" id="draftBanner">
-      💾 تم استعادة مسودة محفوظة تلقائياً
-      <span class="autosave-dot"></span>
-      <button class="clear-btn" onclick="clearDraft()">مسح المسودة</button>
-    </div>
-
+  <div class="form-wrap animate-up" style="animation-delay: 0.1s;">
     <form method="POST" action="{% url 'recipe_add' %}" enctype="multipart/form-data" id="recipeForm">
       {% csrf_token %}
 
@@ -511,24 +298,22 @@
             <span>اسم الوصفة والوصف المختصر</span>
           </div>
         </div>
-
         <div class="field-group">
           <label>🍽️ اسم الوصفة *</label>
-          <input type="text" name="name" id="f_name" placeholder="مثال: كيكة الشوكولاتة الفاخرة" required>
+          <input type="text" name="name" placeholder="مثال: منسف لحم بلدي فاخر" required>
         </div>
-
         <div class="field-group">
           <label>📖 نبذة عن الوصفة *</label>
-          <textarea name="summary" id="f_summary" placeholder="اكتب وصفاً قصيراً وشهياً لوصفتك..." required></textarea>
+          <textarea name="summary" placeholder="اكتب وصفاً قصيراً وشهياً لوصفتك..." required></textarea>
         </div>
-
         <div class="field-row">
           <div class="field-group">
-            <label>🏷️ التصنيف</label>
-            <select name="category" id="f_category">
+            <label>🏷️ التصنيف *</label>
+            <select name="category" required style="background: #0f172a; border: 2px solid #6366f1; color: #fff; border-radius: 16px; padding: 16px 20px; width: 100%; cursor: pointer; font-family: 'Cairo'; font-weight: 700; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236366f1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: left 1rem center; background-size: 1em auto;">
+              <option value="" disabled selected>اختر تصنيفاً للوجبة...</option>
+              <option value="أطباق رئيسية">🍽️ أطباق رئيسية</option>
               <option value="حلويات">🍰 حلويات</option>
-              <option value="أطباق رئيسية">🍛 أطباق رئيسية</option>
-              <option value="عشاء ">🍛 عشاء </option>
+              <option value="عشاء">🍛 عشاء</option>
               <option value="سلطات">🥗 سلطات</option>
               <option value="مشروبات">🥤 مشروبات</option>
               <option value="مقبلات">🫕 مقبلات</option>
@@ -537,8 +322,12 @@
             </select>
           </div>
           <div class="field-group">
+            <label>🌐 المطبخ</label>
+            <input type="text" name="cuisine" placeholder="مثال: سعودي، مصري، عالمي...">
+          </div>
+          <div class="field-group">
             <label>📊 مستوى الصعوبة</label>
-            <select name="difficulty" id="f_difficulty">
+            <select name="difficulty">
               <option value="سهل">🟢 سهل</option>
               <option value="متوسط" selected>🟡 متوسط</option>
               <option value="صعب">🔴 صعب</option>
@@ -550,276 +339,111 @@
       <!-- ② صورة الوصفة -->
       <div class="form-section">
         <div class="section-head">
-          <div class="icon-orb orb-teal">🖼️</div>
+          <div class="icon-orb orb-cyan">🖼️</div>
           <div>
             <h2>صورة الوصفة</h2>
-            <span>اختر صورة شهية لوصفتك (اختياري)</span>
+            <span>اختر صورة شهية تجذب الجميع</span>
           </div>
         </div>
-
-        <div class="image-upload-zone" id="uploadZone">
-          <input type="file" name="image" id="imageInput" accept="image/*">
-          <div class="upload-icon">📷</div>
-          <div class="upload-text">
-            اسحب صورة هنا أو <strong>انقر للاختيار</strong><br>
-            <small style="color:#5a4878;">PNG, JPG, WEBP — حجم أقصى 5MB</small>
+        <div class="image-upload-zone" onclick="document.getElementById('imageInput').click()">
+          <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" onchange="previewImage(this)">
+          <div id="uploadPlaceholder">
+            <div class="upload-icon">📸</div>
+            <div class="upload-text">انقر هنا لاختيار <strong>صورة شهية</strong> لوصفتك</div>
           </div>
+          <img id="imagePreview" style="display:none; width:100%; border-radius:15px; margin-top:10px;">
         </div>
-
-        <div class="image-preview-wrap" id="previewWrap">
-          <img id="previewImg" src="" alt="معاينة الصورة">
-        </div>
-        <button type="button" class="remove-img-btn" id="removeImgBtn" style="display:none;" onclick="removeImage()">
-          ✕ إزالة الصورة
-        </button>
       </div>
 
       <!-- ③ التوقيت والأشخاص -->
       <div class="form-section">
         <div class="section-head">
-          <div class="icon-orb orb-cyan">⏱️</div>
+          <div class="icon-orb orb-orange">⏱️</div>
           <div>
-            <h2>التوقيت والأشخاص</h2>
-            <span>كم يستغرق الطهي وكم عدد الأشخاص</span>
+            <h2>التوقيت والتقديم</h2>
+            <span>كم يستغرق التحضير ولكم شخص؟</span>
           </div>
         </div>
-
         <div class="field-row">
           <div class="field-group">
-            <label>🔪 وقت التحضير</label>
-            <input type="text" name="prep_time" id="f_prep_time" placeholder="مثال: 20 دقيقة">
+            <label>⏱️ وقت التحضير</label>
+            <input type="text" name="prep_time" placeholder="مثال: 15 دقيقة">
           </div>
           <div class="field-group">
             <label>🔥 وقت الطهي *</label>
-            <input type="text" name="cooking_time" id="f_cooking_time" placeholder="مثال: 45 دقيقة" required>
+            <input type="text" name="cooking_time" placeholder="مثال: 45 دقيقة" required>
           </div>
         </div>
-
-        <div class="field-group" style="max-width:300px;">
+        <div class="field-group">
           <label>👥 عدد الأشخاص *</label>
-          <input type="text" name="servings" id="f_servings" placeholder="مثال: 6 أشخاص" required>
+          <input type="text" name="servings" placeholder="مثال: 4-6 أشخاص" required>
         </div>
       </div>
 
       <!-- ④ المكونات -->
       <div class="form-section">
         <div class="section-head">
-          <div class="icon-orb orb-orange">🧂</div>
+          <div class="icon-orb orb-green">🧂</div>
           <div>
-            <h2>مكونات الوصفة</h2>
-            <span>أضف كل مكون واسمه ومقداره بالتفصيل</span>
+            <h2>المكونات</h2>
+            <span>أضف مقادير الوصفة بدقة</span>
           </div>
         </div>
-
-        <div class="ing-headers">
-          <span>اسم المكون</span>
-          <span>المقدار / الكمية</span>
-          <span></span>
-        </div>
-
         <div id="ingredients-list">
           <div class="ing-row">
-            <input type="text" name="ingredient_name" placeholder="مثال: دقيق">
-            <input type="text" name="ingredient_amount" placeholder="مثال: 2 كوب">
-            <button type="button" class="btn-remove" onclick="removeIng(this)">✕</button>
-          </div>
-          <div class="ing-row">
-            <input type="text" name="ingredient_name" placeholder="مثال: سكر">
-            <input type="text" name="ingredient_amount" placeholder="مثال: 1 كوب">
-            <button type="button" class="btn-remove" onclick="removeIng(this)">✕</button>
+            <input type="text" name="ingredient_name" placeholder="اسم المكون">
+            <input type="text" name="ingredient_amount" placeholder="الكمية">
+            <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
           </div>
         </div>
-
-        <button type="button" class="btn-add-ing" onclick="addIngredient()">
-          ＋ إضافة مكون جديد
-        </button>
+        <button type="button" class="btn-add-ing" onclick="addIng()">＋ إضافة مكون جديد</button>
       </div>
 
       <!-- ⑤ شرح الوصفة -->
       <div class="form-section">
         <div class="section-head">
-          <div class="icon-orb orb-pink">📋</div>
+          <div class="icon-orb orb-pink">📜</div>
           <div>
-            <h2>شرح الوصفة خطوة بخطوة</h2>
-            <span>اكتب كل خطوة في سطر منفصل</span>
+            <h2>طريقة التحضير</h2>
+            <span>اكتب خطواتك بوضوح</span>
           </div>
         </div>
-
         <div class="field-group">
-          <label>✍️ خطوات التحضير (كل خطوة في سطر جديد) *</label>
-          <textarea name="instructions" id="f_instructions" rows="8" placeholder="سخّن الفرن على 180 درجة.
-اخلط المكونات الجافة معاً.
-أضف البيض والزبدة واخلط جيداً.
-..."></textarea>
+          <label>✍️ الخطوات (كل خطوة في سطر منفصل) *</label>
+          <textarea name="instructions" rows="8" placeholder="1. ابدأ بتسخين الفرن...
+2. اخلط المكونات..."></textarea>
         </div>
       </div>
 
-      <!-- SUBMIT -->
-      <div class="submit-wrap">
-        <button type="submit" class="btn-submit" id="submitBtn">
-          <span>🚀</span>
-          عرض الوصفة الآن
-          <span class="arrow">←</span>
-        </button>
-      </div>
-
+      <button type="submit" class="btn-submit">
+        <span>🚀</span> عرض الوصفة ونشرها
+      </button>
     </form>
   </div>
 </div>
 
 <script>
-  // ──────────────────────────────────────────────
-  //  localStorage auto-save (draft)
-  // ──────────────────────────────────────────────
-  const DRAFT_KEY = 'recipe_draft_v1';
-
-  const textFields = ['f_name', 'f_summary', 'f_category', 'f_difficulty',
-    'f_prep_time', 'f_cooking_time', 'f_servings', 'f_instructions'];
-
-  function saveDraft() {
-    const draft = {};
-    textFields.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) draft[id] = el.value;
-    });
-    // حفظ المكونات
-    const names = [...document.querySelectorAll('input[name="ingredient_name"]')].map(i => i.value);
-    const amounts = [...document.querySelectorAll('input[name="ingredient_amount"]')].map(i => i.value);
-    draft.ingredients = names.map((n, i) => ({ name: n, amount: amounts[i] || '' }));
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-  }
-
-  function loadDraft() {
-    const raw = localStorage.getItem(DRAFT_KEY);
-    if (!raw) return;
-    try {
-      const draft = JSON.parse(raw);
-      let hasData = false;
-      textFields.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && draft[id]) { el.value = draft[id]; hasData = true; }
-      });
-
-      // استعادة المكونات
-      if (draft.ingredients && draft.ingredients.length > 0) {
-        const list = document.getElementById('ingredients-list');
-        list.innerHTML = '';
-        draft.ingredients.forEach(ing => {
-          addIngredientWithValues(ing.name, ing.amount);
-        });
-        if (draft.ingredients.some(i => i.name)) hasData = true;
+  function previewImage(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('imagePreview').src = e.target.result;
+        document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('uploadPlaceholder').style.display = 'none';
       }
-
-      if (hasData) {
-        document.getElementById('draftBanner').classList.add('visible');
-      }
-    } catch (e) { }
-  }
-
-  function clearDraft() {
-    localStorage.removeItem(DRAFT_KEY);
-    document.getElementById('draftBanner').classList.remove('visible');
-    // مسح الحقول
-    document.getElementById('recipeForm').reset();
-    document.getElementById('ingredients-list').innerHTML = '';
-    addIngredientWithValues('', '');
-    addIngredientWithValues('', '');
-    removeImage();
-  }
-
-  // حفظ تلقائي عند كل تغيير
-  document.addEventListener('DOMContentLoaded', () => {
-    loadDraft();
-
-    document.getElementById('recipeForm').addEventListener('input', saveDraft);
-
-    // مسح المسودة عند الإرسال الناجح
-    document.getElementById('recipeForm').addEventListener('submit', () => {
-      localStorage.removeItem(DRAFT_KEY);
-    });
-  });
-
-  // ──────────────────────────────────────────────
-  //  Image upload preview
-  // ──────────────────────────────────────────────
-  const imageInput = document.getElementById('imageInput');
-  const previewWrap = document.getElementById('previewWrap');
-  const previewImg = document.getElementById('previewImg');
-  const removeBtn = document.getElementById('removeImgBtn');
-  const uploadZone = document.getElementById('uploadZone');
-
-  imageInput.addEventListener('change', function () {
-    const file = this.files[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert('حجم الصورة يتجاوز 5MB، يرجى اختيار صورة أصغر.');
-      this.value = '';
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = e => {
-      previewImg.src = e.target.result;
-      previewWrap.style.display = 'block';
-      removeBtn.style.display = 'inline-flex';
-      uploadZone.style.borderColor = '#00e5ff';
-    };
-    reader.readAsDataURL(file);
-  });
-
-  // Drag & Drop
-  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-  uploadZone.addEventListener('drop', e => {
-    e.preventDefault();
-    uploadZone.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      imageInput.files = dt.files;
-      imageInput.dispatchEvent(new Event('change'));
-    }
-  });
-
-  function removeImage() {
-    imageInput.value = '';
-    previewImg.src = '';
-    previewWrap.style.display = 'none';
-    removeBtn.style.display = 'none';
-    uploadZone.style.borderColor = '';
-  }
-
-  // ──────────────────────────────────────────────
-  //  Ingredients dynamic rows
-  // ──────────────────────────────────────────────
-  function addIngredient() {
-    addIngredientWithValues('', '');
-    saveDraft();
-  }
-
-  function addIngredientWithValues(nameVal, amountVal) {
-    const list = document.getElementById('ingredients-list');
-    const row = document.createElement('div');
-    row.className = 'ing-row';
-    row.innerHTML = `
-    <input type="text" name="ingredient_name"   placeholder="اسم المكون"  value="${escHtml(nameVal)}">
-    <input type="text" name="ingredient_amount" placeholder="المقدار"     value="${escHtml(amountVal)}">
-    <button type="button" class="btn-remove" onclick="removeIng(this)">✕</button>
-  `;
-    list.appendChild(row);
-    if (!nameVal) row.querySelector('input').focus();
-  }
-
-  function removeIng(btn) {
-    const list = document.getElementById('ingredients-list');
-    if (list.children.length > 1) {
-      btn.closest('.ing-row').remove();
-      saveDraft();
+      reader.readAsDataURL(input.files[0]);
     }
   }
 
-  function escHtml(str) {
-    return (str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  function addIng() {
+    const div = document.createElement('div');
+    div.className = 'ing-row';
+    div.innerHTML = `
+      <input type="text" name="ingredient_name" placeholder="اسم المكون">
+      <input type="text" name="ingredient_amount" placeholder="الكمية">
+      <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+    `;
+    document.getElementById('ingredients-list').appendChild(div);
   }
 </script>
 {% endblock %}

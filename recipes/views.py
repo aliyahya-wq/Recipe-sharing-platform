@@ -1,225 +1,205 @@
-import base64
 import os
-import uuid
-
 from django.conf import settings
-from django.shortcuts import render, redirect
-
-
-# ─── helpers ──────────────────────────────────────────────────────────────────
-
-def _save_image(image_file):
-    """حفظ الصورة في MEDIA_ROOT وإرجاع المسار النسبي (للعرض)."""
-    if not image_file:
-        return None
-    ext = os.path.splitext(image_file.name)[-1].lower()
-    filename = f"{uuid.uuid4().hex}{ext}"
-    media_dir = os.path.join(settings.MEDIA_ROOT, 'recipe_images')
-    os.makedirs(media_dir, exist_ok=True)
-    path = os.path.join(media_dir, filename)
-    with open(path, 'wb+') as f:
-        for chunk in image_file.chunks():
-            f.write(chunk)
-    return f"/media/recipe_images/{filename}"
-
-
-def _build_recipe(request):
-    """بناء قاموس الوصفة من POST + ملف الصورة."""
-    names   = request.POST.getlist('ingredient_name')
-    amounts = request.POST.getlist('ingredient_amount')
-    ingredients = [
-        {'name': n.strip(), 'amount': a.strip()}
-        for n, a in zip(names, amounts)
-        if n.strip()
-    ]
-
-    steps_raw = request.POST.get('instructions', '').strip().split('\n')
-    steps = [s.strip() for s in steps_raw if s.strip()]
-
-    image_url = _save_image(request.FILES.get('image'))
-
-    from datetime import datetime
-    now = datetime.now()
-    created_at = now.strftime("%Y/%m/%d - %H:%M")
-
-    return {
-        'id':           uuid.uuid4().hex[:8],
-        'name':         request.POST.get('name', '').strip(),
-        'summary':      request.POST.get('summary', '').strip(),
-        'category':     request.POST.get('category', '').strip(),
-        'cooking_time': request.POST.get('cooking_time', '').strip(),
-        'prep_time':    request.POST.get('prep_time', '').strip(),
-        'servings':     request.POST.get('servings', '').strip(),
-        'difficulty':   request.POST.get('difficulty', 'متوسط'),
-        'ingredients':  ingredients,
-        'instructions': steps,
-        'show_table':   True,
-        'comments':     [],
-        'image':        image_url,
-        'created_at':   created_at,
-    }
-
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Recipe, Category, Ingredient, Step, Comment, Rating, Favorite, Like
 
 # ─── views ────────────────────────────────────────────────────────────────────
 
 def recipe_list(request):
-    all_recipes = request.session.get('all_recipes', [])
-    return render(request, 'recipes/recipes.html', {'recipes': all_recipes})
-
-
-def recipe_detail(request, recipe_id):
-    all_recipes = request.session.get('all_recipes', [])
-    # البحث عن الوصفة المطلوبة
-    recipe = next((r for r in all_recipes if r['id'] == recipe_id), None)
+    recipes = Recipe.objects.all()
     
-    if not recipe:
-        # إذا لم يجدها في الكل، ربما هي الوصفة الافتراضية للتعمية
-        recipe = {
-            'id': 'default',
-            'name': 'وصفة الدجاج بالكاري',
-            'summary': 'وصفة شهية للدجاج بالكاري مع الأرز، مثالية للعائلة.',
-            'category': 'غداء',
-            'ingredients': [
-                {'name': 'دجاج',         'amount': '500 جرام'},
-                {'name': 'كاري مسحوق',  'amount': '2 ملعقة كبيرة'},
-                {'name': 'بصل',          'amount': '1 حبة'},
-                {'name': 'ثوم',          'amount': '2 فص'},
-                {'name': 'زيت',          'amount': '3 ملعقة كبيرة'},
-            ],
-            'instructions': ['سخن الزيت', 'أضف البصل والثوم ثم الدجاج والكاري', 'اطبخ لمدة 30 دقيقة'],
-            'cooking_time': '45 دقيقة',
-            'prep_time': '15 دقيقة',
-            'servings': '4 أشخاص',
-            'difficulty': 'متوسط',
-            'show_table': True,
-            'image': None,
-            'comments': [
-                {'user': 'أحمد', 'avatar': 'أ', 'text': 'رائعة جداً!', 'date': 'منذ يوم',
-                 'replies': [{'user': 'فاطمة', 'avatar': 'ف', 'text': 'شكراً!', 'date': 'منذ ساعة'}]},
-                {'user': 'سارة', 'avatar': 'س', 'text': 'أحببتها.', 'date': 'منذ يومين', 'replies': []},
-            ],
-        }
-    if recipe:
-        favorites = request.session.get('favorites', [])
-        recipe['is_favorite'] = recipe['id'] in favorites
-    return render(request, 'recipes/recipe_new.html', {'recipe': recipe})
-
-
-def add_comment(request, recipe_id):
-    if request.method == 'POST':
-        comment_text = request.POST.get('comment', '').strip()
-        if comment_text:
-            all_recipes = request.session.get('all_recipes', [])
-            for r in all_recipes:
-                if r['id'] == recipe_id:
-                    if 'comments' not in r:
-                        r['comments'] = []
-                    r['comments'].append({
-                        'user': 'زائر',
-                        'avatar': 'ز',
-                        'text': comment_text,
-                        'date': 'الآن',
-                        'replies': []
-                    })
-                    break
-            request.session['all_recipes'] = all_recipes
-            request.session.modified = True
-            
-            # تحديث recipe_data أيضاً إذا كانت هي نفس الوصفة
-            recipe_data = request.session.get('recipe_data')
-            if recipe_data and recipe_data['id'] == recipe_id:
-                if 'comments' not in recipe_data:
-                    recipe_data['comments'] = []
-                recipe_data['comments'].append({
-                    'user': 'زائر',
-                    'avatar': 'ز',
-                    'text': comment_text,
-                    'date': 'الآن',
-                    'replies': []
-                })
-                request.session['recipe_data'] = recipe_data
-
-    return redirect('recipe_detail', recipe_id=recipe_id)
-
-
-def add_reply(request, recipe_id, comment_index):
-    if request.method == 'POST':
-        reply_text = request.POST.get('reply', '').strip()
-        if reply_text:
-            all_recipes = request.session.get('all_recipes', [])
-            for r in all_recipes:
-                if r['id'] == recipe_id:
-                    if 'comments' in r and len(r['comments']) > comment_index:
-                        r['comments'][comment_index]['replies'].append({
-                            'user': 'زائر',
-                            'avatar': 'ز',
-                            'text': reply_text,
-                            'date': 'الآن'
-                        })
-                    break
-            request.session['all_recipes'] = all_recipes
-            request.session.modified = True
-    return redirect('recipe_detail', recipe_id=recipe_id)
-
-
-def rate_recipe(request, recipe_id):
-    if request.method == 'POST':
-        rating = request.POST.get('rating')
-        if rating:
-            all_recipes = request.session.get('all_recipes', [])
-            for r in all_recipes:
-                if r['id'] == recipe_id:
-                    r['user_rating'] = int(rating)
-                    break
-            request.session['all_recipes'] = all_recipes
-            request.session.modified = True
-    return redirect('recipe_detail', recipe_id=recipe_id)
-
-
-def toggle_favorite(request, recipe_id):
-    favorites = request.session.get('favorites', [])
-    if recipe_id in favorites:
-        favorites.remove(recipe_id)
+    # التحقق من المفضلات
+    favorite_ids = []
+    if request.user.is_authenticated:
+        favorite_ids = Favorite.objects.filter(user=request.user).values_list('recipe_id', flat=True)
     else:
-        favorites.append(recipe_id)
-    request.session['favorites'] = favorites
-    request.session.modified = True
-    return redirect('recipe_detail', recipe_id=recipe_id)
-
-
-def favorites_list(request):
-    favorites = request.session.get('favorites', [])
-    all_recipes = request.session.get('all_recipes', [])
-    favorite_recipes = [r for r in all_recipes if r['id'] in favorites]
-    return render(request, 'recipes/recipes.html', {
-        'recipes': favorite_recipes, 
-        'is_favorites_page': True,
-        'page_title': 'وصفاتي المفضلة'
+        favorite_ids = request.session.get('guest_favorites', [])
+    
+    all_categories = Category.objects.all()
+    
+    return render(request, 'home.html', {
+        'recipes': recipes,
+        'favorite_ids': [str(id) for id in favorite_ids],
+        'all_categories': all_categories
     })
 
+def recipe_detail(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    
+    # التحقق مما إذا كانت الوصفة في المفضلة أو معجب بها
+    is_favorite = False
+    is_liked = False
+    
+    if request.user.is_authenticated:
+        is_favorite = Favorite.objects.filter(user=request.user, recipe=recipe).exists()
+        is_liked = Like.objects.filter(user=request.user, recipe=recipe).exists()
+    else:
+        # للزوار: التحقق من الجلسة
+        guest_favs = request.session.get('guest_favorites', [])
+        guest_likes = request.session.get('guest_likes', [])
+        is_favorite = str(recipe.id) in guest_favs
+        is_liked = str(recipe.id) in guest_likes
 
+    avg_rating = recipe.average_rating
+    rating_count = Rating.objects.filter(recipe=recipe).count()
+    comments = recipe.comments.filter(parent=None).order_by('-created_at')
+    
+    return render(request, 'recipes/recipe_new.html', {
+        'recipe': recipe,
+        'avg_rating': avg_rating,
+        'rating_count': rating_count,
+        'is_favorite': is_favorite,
+        'is_liked': is_liked,
+        'comments': comments
+    })
+
+@login_required
 def recipe_add(request):
-    """صفحة نموذج إدخال الوصفة."""
     if request.method == 'POST':
-        recipe = _build_recipe(request)
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        cook_time = request.POST.get('cook_time')
+        servings = request.POST.get('servings')
+        difficulty = request.POST.get('difficulty')
+        category_id = request.POST.get('category')
+        cuisine = request.POST.get('cuisine')
+        image = request.FILES.get('image')
 
-        # حفظ الوصفة الحالية في الجلسة
-        request.session['recipe_data'] = recipe
+        category = get_object_or_404(Category, id=category_id)
+        
+        recipe = Recipe.objects.create(
+            author=request.user,
+            title=title,
+            description=description,
+            cook_time=cook_time,
+            servings=servings,
+            difficulty=difficulty,
+            category=category,
+            cuisine=cuisine,
+            image=image
+        )
 
-        # إضافة الوصفة لقائمة الكل (للصفحة الرئيسية)
-        all_recipes = request.session.get('all_recipes', [])
-        all_recipes.insert(0, recipe)  # حفظ الوصفة كاملة
-        request.session['all_recipes'] = all_recipes
-        request.session.modified = True
+        # إضافة المكونات
+        names = request.POST.getlist('ingredient_name')
+        amounts = request.POST.getlist('ingredient_amount')
+        for n, a in zip(names, amounts):
+            if n.strip():
+                Ingredient.objects.create(recipe=recipe, name=n.strip(), quantity=a.strip())
 
-        return redirect('recipe_result')
+        # إضافة الخطوات
+        steps_raw = request.POST.get('instructions', '').strip().split('\n')
+        for i, s in enumerate(steps_raw):
+            if s.strip():
+                Step.objects.create(recipe=recipe, order=i+1, description=s.strip())
 
-    return render(request, 'recipes/recipe_add.html')
+        messages.success(request, 'تم إضافة الوصفة بنجاح! 🎉')
+        return redirect('recipe_detail', recipe_id=recipe.id)
 
+    categories = Category.objects.all()
+    return render(request, 'recipes/recipe_add.html', {'categories': categories})
 
 def recipe_result(request):
-    """عرض الوصفة من الجلسة."""
-    recipe = request.session.get('recipe_data')
-    if not recipe:
-        return redirect('recipe_add')
-    return redirect('recipe_detail', recipe_id=recipe['id'])
+    query = request.GET.get('q', '')
+    recipes = Recipe.objects.filter(title__icontains=query)
+    return render(request, 'recipes/recipes.html', {'recipes': recipes, 'query': query})
+
+def add_comment(request, recipe_id):
+    if request.method == 'POST' and request.user.is_authenticated:
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        text = request.POST.get('comment')
+        Comment.objects.create(user=request.user, recipe=recipe, text=text)
+        messages.success(request, 'تم إضافة تعليقك!')
+    return redirect('recipe_detail', recipe_id=recipe_id)
+
+def add_reply(request, recipe_id, comment_id):
+    if request.method == 'POST' and request.user.is_authenticated:
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        parent_comment = get_object_or_404(Comment, id=comment_id)
+        text = request.POST.get('reply')
+        Comment.objects.create(user=request.user, recipe=recipe, text=text, parent=parent_comment)
+        messages.success(request, 'تم إضافة ردك!')
+    return redirect('recipe_detail', recipe_id=recipe_id)
+
+def rate_recipe(request, recipe_id):
+    if request.method == 'POST' and request.user.is_authenticated:
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        val = request.POST.get('rating')
+        if val:
+            Rating.objects.update_or_create(
+                user=request.user, recipe=recipe,
+                defaults={'value': int(val)}
+            )
+            messages.success(request, 'شكراً لتقييمك!')
+    return redirect('recipe_detail', recipe_id=recipe_id)
+
+def toggle_favorite(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    
+    if request.user.is_authenticated:
+        favorite, created = Favorite.objects.get_or_create(user=request.user, recipe=recipe)
+        if not created:
+            favorite.delete()
+            messages.info(request, 'تم إزالة الوصفة من المحفوظات.')
+        else:
+            messages.success(request, 'تم حفظ الوصفة في المفضلات! 🔖')
+    else:
+        # للزوار: استخدام الجلسة
+        guest_favs = request.session.get('guest_favorites', [])
+        recipe_id_str = str(recipe.id)
+        
+        if recipe_id_str in guest_favs:
+            guest_favs.remove(recipe_id_str)
+            messages.info(request, 'تم إزالة الوصفة من المحفوظات.')
+        else:
+            guest_favs.append(recipe_id_str)
+            messages.success(request, 'تم حفظ الوصفة في المفضلات! 🔖')
+        
+        request.session['guest_favorites'] = guest_favs
+        request.session.modified = True
+        
+    return redirect('recipe_detail', recipe_id=recipe_id)
+
+def toggle_like(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    
+    if request.user.is_authenticated:
+        like, created = Like.objects.get_or_create(user=request.user, recipe=recipe)
+        if not created:
+            like.delete()
+            messages.info(request, 'تم إزالة الإعجاب.')
+        else:
+            messages.success(request, 'تم إضافة الإعجاب! ❤️')
+    else:
+        # للزوار: استخدام الجلسة
+        guest_likes = request.session.get('guest_likes', [])
+        recipe_id_str = str(recipe.id)
+        
+        if recipe_id_str in guest_likes:
+            guest_likes.remove(recipe_id_str)
+            messages.info(request, 'تم إزالة الإعجاب.')
+        else:
+            guest_likes.append(recipe_id_str)
+            messages.success(request, 'تم إضافة الإعجاب! ❤️')
+        
+        request.session['guest_likes'] = guest_likes
+        request.session.modified = True
+        
+    return redirect('recipe_detail', recipe_id=recipe_id)
+
+def favorites_list(request):
+    if request.user.is_authenticated:
+        favorites = Favorite.objects.filter(user=request.user)
+        recipes = [f.recipe for f in favorites]
+    else:
+        guest_favs = request.session.get('guest_favorites', [])
+        recipes = Recipe.objects.filter(id__in=guest_favs)
+        
+    return render(request, 'recipes/recipes.html', {
+        'recipes': recipes,
+        'title': 'وصفاتي المحفوظة'
+    })
+
+def admin_home(request):
+    return render(request, 'baes.html')

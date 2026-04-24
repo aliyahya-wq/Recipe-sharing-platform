@@ -35,7 +35,7 @@ SoftDeleteMixin (abstract)
 
 
 ----------------------
-UserActivity (نشاط المستخدم)
+UserActivity  (نشاط المستخدم)
 - user: ForeignKey إلى AUTH_USER_MODEL، on_delete=models.CASCADE
 - action: CharField مع خيارات ACTION_CHOICES
 - details: TextField

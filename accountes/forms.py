@@ -5,4 +5,10 @@ from .models import User
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
+        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'experience_years')
+        labels = {
+            'bio': 'نبذة تعريفية عنك (Bio)',
+        }
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 3, 'placeholder': 'أخبرنا قليلاً عن شغفك بالطبخ...'}),
+        }

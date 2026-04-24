@@ -1,15 +1,158 @@
-﻿{% extends 'baes.html' %}
+{% extends 'baes.html' %}
 
-{% block title %}تسجيل الدخول - منصة الأكل{% endblock %}
+{% block title %}تسجيل الدخول - PlatEeat{% endblock %}
 
 {% block content %}
-<h1>تسجيل الدخول</h1>
-<form method="post">
-    {% csrf_token %}
-    <label for="username">اسم المستخدم:</label>
-    <input type="text" name="username" required><br>
-    <label for="password">كلمة المرور:</label>
-    <input type="password" name="password" required><br>
-    <button type="submit">دخول</button>
-</form>
+<style>
+    .auth-page {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 150px);
+        padding: 60px 24px;
+        background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent),
+                    radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.1), transparent);
+    }
+
+    .auth-card {
+        background: #1e293b;
+        width: 100%;
+        max-width: 450px;
+        padding: 50px;
+        border-radius: 32px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        border: 1px solid #334155;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 6px;
+        background: linear-gradient(90deg, #6366f1, #0ea5e9);
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .auth-header h1 {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #fff;
+        margin-bottom: 10px;
+    }
+
+    .auth-header p {
+        color: #94a3b8;
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #cbd5e1;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 16px 20px;
+        background: #0f172a;
+        border: 2px solid #334155;
+        border-radius: 16px;
+        color: #fff;
+        font-family: 'Cairo';
+        font-size: 1rem;
+        outline: none;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        background: #1e293b;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn-auth {
+        width: 100%;
+        padding: 18px;
+        background: linear-gradient(90deg, #6366f1, #4f46e5);
+        color: #fff;
+        border: none;
+        border-radius: 16px;
+        font-family: 'Cairo';
+        font-size: 1.2rem;
+        font-weight: 900;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-auth:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.5);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 1px solid #334155;
+        font-size: 0.95rem;
+        color: #94a3b8;
+    }
+
+    .auth-footer a {
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    /* ── ANIMATIONS ── */
+    .animate-card {
+        animation: cardEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes cardEnter {
+        from { opacity: 0; transform: translateY(40px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+</style>
+
+<div class="auth-page">
+    <div class="auth-card animate-card">
+        <div class="auth-header">
+            <h1>مرحباً بعودتك 👋</h1>
+            <p>سعداء برؤيتك مجدداً في مطبخ PlatEeat</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">اسم المستخدم</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="أدخل اسم المستخدم الخاص بك..." required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="أدخل كلمة المرور هنا..." required>
+            </div>
+
+            <button type="submit" class="btn-auth">تسجيل الدخول الآن ✨</button>
+        </form>
+
+        <div class="auth-footer">
+            ليس لديك حساب؟ <a href="{% url 'register' %}">إنشاء حساب جديد مجاناً</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

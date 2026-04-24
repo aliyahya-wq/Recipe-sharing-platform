@@ -1,21 +1,32 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from recipes.models import ContactMessage, Recipe, Category, Favorite
 
 def home(request):
-    recipes = request.session.get('all_recipes', [])
+    # جلب آخر 6 وصفات تمت إضافتها
+    recent_recipes = Recipe.objects.all().order_by('-created_at')[:6]
     
-    # قائمة التصنيفات الأساسية المتوفرة في الموقع
-    base_categories = {'حلويات', 'أطباق رئيسية', 'عشاء', 'سلطات', 'مشروبات', 'مقبلات', 'فطور', 'غداء'}
+    # جلب قائمة المفضلات للمستخدم الحالي (أو الزائر)
+    favorite_ids = []
+    if request.user.is_authenticated:
+        favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('recipe_id', flat=True))
+    else:
+        # تحويل القيم في الجلسة إلى أرقام (أو نصوص حسب طريقة التخزين) للتوافق
+        guest_favs = request.session.get('guest_favorites', [])
+        favorite_ids = [int(fid) if str(fid).isdigit() else fid for fid in guest_favs]
+
+    # وسم كل وصفة إذا كانت في المفضلة أم لا
+    for recipe in recent_recipes:
+        recipe.is_favorited = recipe.id in favorite_ids or str(recipe.id) in [str(x) for x in favorite_ids]
     
-    # إضافة أي تصنيفات جديدة قد يكون المستخدم أضافها في وصفاته
-    user_categories = set(r.get('category').strip() for r in recipes if r.get('category'))
-    
-    # دمج المجموعتين لحساب الإجمالي
-    total_categories = base_categories.union(user_categories)
-    category_count = len(total_categories)
+    all_categories = Category.objects.all()
+    total_recipes = Recipe.objects.count()
     
     return render(request, 'home.html', {
-        'recipes': recipes, 
-        'category_count': category_count
+        'recipes': recent_recipes, 
+        'total_recipes_count': total_recipes,
+        'category_count': all_categories.count(),
+        'all_categories': all_categories
     })
 
 def recipes(request):
@@ -25,4 +36,20 @@ def about(request):
     return render(request, 'about.html')
 
 def contact(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        
+        if name and email and message:
+            ContactMessage.objects.create(
+                name=name,
+                email=email,
+                subject=subject,
+                message=message
+            )
+            messages.success(request, 'تم إرسال رسالتك بنجاح! شكراً لتواصلك معنا.')
+            return redirect('contact')
+            
     return render(request, 'contact.html')
