@@ -1,0 +1,176 @@
+{% extends 'baes.html' %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+    .connections-page {
+        font-family: 'Cairo', sans-serif;
+        background: var(--bg-main);
+        min-height: 100vh;
+        direction: rtl;
+        padding: 60px 24px;
+        color: var(--text-main);
+    }
+    
+    .connections-container {
+        max-width: 1080px;
+        margin: 0 auto;
+    }
+
+    .connections-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: center;
+        margin-bottom: 40px;
+    }
+
+    .connections-header h2 {
+        margin: 0 0 10px;
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: #fff;
+    }
+
+    .connections-header p {
+        margin: 0;
+        color: var(--text-dim);
+        font-size: 1.1rem;
+    }
+
+    .connections-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 32px;
+        padding: 40px;
+        box-shadow: var(--shadow);
+    }
+
+    .connections-row {
+        display: grid;
+        gap: 30px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .connection-card {
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 30px;
+        transition: transform 0.3s;
+    }
+
+    .connection-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+    }
+
+    .connection-card h3 {
+        margin: 0 0 20px;
+        font-size: 1.3rem;
+        color: #fff;
+        font-weight: 900;
+        border-bottom: 1px dashed var(--border);
+        padding-bottom: 15px;
+    }
+
+    .connection-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 0 12px 12px;
+        padding: 12px 24px;
+        border-radius: 999px;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 800;
+        transition: all 0.2s;
+    }
+
+    .connection-pill:hover {
+        background: var(--primary);
+        color: #fff;
+        transform: scale(1.05);
+    }
+
+    .empty-text {
+        color: var(--text-dim);
+        line-height: 1.8;
+        font-size: 1.1rem;
+        text-align: center;
+        padding: 30px 0;
+    }
+
+    .back-link {
+        display: inline-block;
+        padding: 14px 28px;
+        border-radius: 16px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 800;
+        transition: all 0.3s;
+    }
+
+    .back-link:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-2px);
+    }
+</style>
+
+<section class="connections-page">
+    <div class="connections-container">
+        <div class="connections-header">
+            <div>
+                {% if tab == 'following' %}
+                <h2>الأشخاص الذين يتابعهم {{ profile_user.username }}</h2>
+                <p>هنا يمكنك رؤية جميع الحسابات التي يتابعها.</p>
+                {% elif tab == 'followers' %}
+                <h2>متابعو {{ profile_user.username }}</h2>
+                <p>هنا يمكنك رؤية جميع الأشخاص الذين يتابعون هذا الحساب.</p>
+                {% else %}
+                <h2>العلاقات الاجتماعية لـ {{ profile_user.username }}</h2>
+                <p>هنا يمكنك رؤية من يتابع {{ profile_user.username }} ومن يتابعه.</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'user_profile' profile_user.username %}" class="back-link">العودة إلى الملف الشخصي 🔙</a>
+        </div>
+
+        <div class="connections-card">
+            <div class="connections-row">
+                {% if tab == 'followers' or tab == 'all' %}
+                <div class="connection-card" id="followers">
+                    <h3>المتابعون ({{ followers_count }})</h3>
+                    {% if followers %}
+                        {% for follower in followers %}
+                            <a href="{% url 'user_profile' follower.username %}" class="connection-pill">👤 {{ follower.username }}</a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="empty-text">لا يوجد متابعين حتى الآن 📭</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if tab == 'following' or tab == 'all' %}
+                <div class="connection-card" id="following">
+                    <h3>يتابعهم ({{ following_count }})</h3>
+                    {% if following %}
+                        {% for following_user in following %}
+                            <a href="{% url 'user_profile' following_user.username %}" class="connection-pill">👤 {{ following_user.username }}</a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="empty-text">لم يتابع هذا المستخدم أي شخص بعد 📭</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

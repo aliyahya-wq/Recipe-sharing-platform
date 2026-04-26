@@ -350,7 +350,7 @@
                 <div style="width:60px; height:60px; border-radius:50%; background:var(--bg-main); display:flex; align-items:center; justify-content:center; font-size:1.8rem; border: 2px solid var(--primary);">👨‍🍳</div>
                 {% endif %}
                 <div class="author-info">
-                    <h4>{{ recipe.author.username }}</h4>
+                    <h4><a href="{% url 'user_profile' recipe.author.username %}" style="color: inherit; text-decoration:none;">{{ recipe.author.username }}</a></h4>
                     <span>مؤلف الوصفة • خبرة {{ recipe.author.experience_years }} سنوات</span>
                 </div>
             </div>
@@ -364,6 +364,16 @@
                     {% csrf_token %}
                     <button type="submit" class="action-btn {% if is_favorite %}active{% endif %}" style="color: {% if is_favorite %}#fbbf24{% else %}var(--text-dim){% endif %}; border-color: {% if is_favorite %}#fbbf24{% else %}var(--border){% endif %}; background: {% if is_favorite %}rgba(251, 191, 36, 0.1){% else %}var(--bg-card){% endif %};" title="حفظ">🔖</button>
                 </form>
+                {% if user.is_authenticated and recipe.author != user %}
+                <form action="{% url 'toggle_follow' recipe.author.username %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn {% if is_following %}active{% endif %}" style="min-width:auto; padding:0 14px; font-size:0.95rem;">
+                        {% if is_following %}إلغاء متابعة{% else %}تابع{% endif %}
+                    </button>
+                </form>
+                {% elif not user.is_authenticated %}
+                <a href="{% url 'login' %}" class="action-btn" style="padding:0 14px;">تابع</a>
+                {% endif %}
                 <div class="action-btn" onclick="window.print()" title="طباعة">🖨️</div>
             </div>
         </div>

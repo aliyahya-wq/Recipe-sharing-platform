@@ -1,6 +1,6 @@
 {% extends 'baes.html' %}
 
-{% block title %}إنشاء حساب جديد - PlatEeat{% endblock %}
+{% block title %}تحديث بيانات الحساب - PlatEeat{% endblock %}
 
 {% block content %}
 <style>
@@ -135,21 +135,6 @@
         box-shadow: 0 15px 20px -5px rgba(99, 102, 241, 0.5);
     }
 
-    .auth-footer {
-        text-align: center;
-        margin-top: 25px;
-        padding-top: 20px;
-        border-top: 1px solid #334155;
-        font-size: 0.9rem;
-        color: #94a3b8;
-    }
-
-    .auth-footer a {
-        color: #6366f1;
-        text-decoration: none;
-        font-weight: 700;
-    }
-
     /* ── ANIMATIONS ── */
     .animate-card {
         animation: cardEnter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
@@ -183,8 +168,8 @@
 <div class="auth-page">
     <div class="auth-card animate-card" style="max-width: 600px; padding: 40px;">
         <div class="auth-header" style="margin-bottom: 25px;">
-            <h1 style="font-size: 1.8rem;">انضم إلينا الآن ✨</h1>
-            <p style="font-size: 0.9rem;">ابدأ رحلتك في عالم النكهات وشارك وصفاتك الخاصة</p>
+            <h1 style="font-size: 1.8rem;">تحديث الحساب ⚙️</h1>
+            <p style="font-size: 0.9rem;">قم بتعديل بيانات حسابك وصورتك الشخصية لتبقى دائماً في أفضل حلة</p>
         </div>
 
         <form method="post" enctype="multipart/form-data">
@@ -202,16 +187,9 @@
 
             <div class="form-grid">
                 {% for field in form %}
-                <div class="form-group {% if field.name == 'bio' or field.name == 'profile_picture' %}full-width{% endif %}">
+                <div class="form-group {% if field.name == 'bio' or field.name == 'profile_picture' or 'link' in field.name %}full-width{% endif %}">
                     <label for="{{ field.id_for_label }}">
-                        {% if field.name == 'username' %}اسم المستخدم
-                        {% elif field.name == 'email' %}البريد الإلكتروني (اختياري)
-                        {% elif field.name == 'first_name' %}الاسم الأول
-                        {% elif field.name == 'last_name' %}اسم العائلة
-                        {% elif field.name == 'bio' %}نبذة تعريفية عنك
-                        {% elif field.name == 'password1' %}كلمة المرور
-                        {% elif field.name == 'password2' %}تأكيد المرور
-                        {% else %}{{ field.label }}{% endif %}
+                        {{ field.label }}
                     </label>
                     {{ field }}
                     {% if field.help_text %}
@@ -228,12 +206,8 @@
                 {% endfor %}
             </div>
 
-            <button type="submit" class="btn-auth">إنشاء حسابي مجاناً 🚀</button>
+            <button type="submit" class="btn-auth">تحديث البيانات ✔️</button>
         </form>
-
-        <div class="auth-footer">
-            لديك حساب بالفعل؟ <a href="{% url 'login' %}">سجل دخولك من هنا</a>
-        </div>
     </div>
 </div>
 {% endblock %}

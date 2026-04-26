@@ -281,12 +281,12 @@
 <div class="add-page">
   <div class="add-hero animate-up">
     <div class="badge">👨‍🍳 شاركنا إبداعك</div>
-    <h1>أضف وصفة جديدة</h1>
+    <h1>{% if recipe %}تعديل الوصفة{% else %}أضف وصفة جديدة{% endif %}</h1>
     <p>حوّل وصفتك السرية إلى تحفة فنية يراها الجميع</p>
   </div>
 
   <div class="form-wrap animate-up" style="animation-delay: 0.1s;">
-    <form method="POST" action="{% url 'recipe_add' %}" enctype="multipart/form-data" id="recipeForm">
+    <form method="POST" enctype="multipart/form-data" id="recipeForm">
       {% csrf_token %}
 
       <!-- ① المعلومات الأساسية -->
@@ -300,37 +300,32 @@
         </div>
         <div class="field-group">
           <label>🍽️ اسم الوصفة *</label>
-          <input type="text" name="name" placeholder="مثال: منسف لحم بلدي فاخر" required>
+          <input type="text" name="title" value="{{ recipe.title|default_if_none:'' }}" placeholder="مثال: منسف لحم بلدي فاخر" required>
         </div>
         <div class="field-group">
           <label>📖 نبذة عن الوصفة *</label>
-          <textarea name="summary" placeholder="اكتب وصفاً قصيراً وشهياً لوصفتك..." required></textarea>
+          <textarea name="description" placeholder="اكتب وصفاً قصيراً وشهياً لوصفتك..." required>{{ recipe.description|default_if_none:'' }}</textarea>
         </div>
         <div class="field-row">
           <div class="field-group">
             <label>🏷️ التصنيف *</label>
             <select name="category" required style="background: #0f172a; border: 2px solid #6366f1; color: #fff; border-radius: 16px; padding: 16px 20px; width: 100%; cursor: pointer; font-family: 'Cairo'; font-weight: 700; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236366f1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: left 1rem center; background-size: 1em auto;">
-              <option value="" disabled selected>اختر تصنيفاً للوجبة...</option>
-              <option value="أطباق رئيسية">🍽️ أطباق رئيسية</option>
-              <option value="حلويات">🍰 حلويات</option>
-              <option value="عشاء">🍛 عشاء</option>
-              <option value="سلطات">🥗 سلطات</option>
-              <option value="مشروبات">🥤 مشروبات</option>
-              <option value="مقبلات">🫕 مقبلات</option>
-              <option value="شوربات">🍲 شوربات</option>
-              <option value="مخبوزات">🥐 مخبوزات</option>
+              <option value="" disabled {% if not recipe %}selected{% endif %}>اختر تصنيفاً للوجبة...</option>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}" {% if recipe and recipe.category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
             </select>
           </div>
           <div class="field-group">
             <label>🌐 المطبخ</label>
-            <input type="text" name="cuisine" placeholder="مثال: سعودي، مصري، عالمي...">
+            <input type="text" name="cuisine" value="{{ recipe.cuisine|default_if_none:'' }}" placeholder="مثال: سعودي، مصري، عالمي...">
           </div>
           <div class="field-group">
             <label>📊 مستوى الصعوبة</label>
             <select name="difficulty">
-              <option value="سهل">🟢 سهل</option>
-              <option value="متوسط" selected>🟡 متوسط</option>
-              <option value="صعب">🔴 صعب</option>
+              <option value="سهل" {% if recipe.difficulty == 'سهل' %}selected{% endif %}>🟢 سهل</option>
+              <option value="متوسط" {% if not recipe or recipe.difficulty == 'متوسط' %}selected{% endif %}>🟡 متوسط</option>
+              <option value="صعب" {% if recipe.difficulty == 'صعب' %}selected{% endif %}>🔴 صعب</option>
             </select>
           </div>
         </div>
@@ -347,11 +342,19 @@
         </div>
         <div class="image-upload-zone" onclick="document.getElementById('imageInput').click()">
           <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" onchange="previewImage(this)">
+          {% if recipe and recipe.image %}
+          <div id="uploadPlaceholder" style="display:none;">
+            <div class="upload-icon">📸</div>
+            <div class="upload-text">انقر هنا لاختيار <strong>صورة شهية</strong> لوصفتك</div>
+          </div>
+          <img id="imagePreview" src="{{ recipe.image.url }}" style="display:block; width:100%; border-radius:15px; margin-top:10px;">
+          {% else %}
           <div id="uploadPlaceholder">
             <div class="upload-icon">📸</div>
             <div class="upload-text">انقر هنا لاختيار <strong>صورة شهية</strong> لوصفتك</div>
           </div>
           <img id="imagePreview" style="display:none; width:100%; border-radius:15px; margin-top:10px;">
+          {% endif %}
         </div>
       </div>
 
@@ -367,16 +370,16 @@
         <div class="field-row">
           <div class="field-group">
             <label>⏱️ وقت التحضير</label>
-            <input type="text" name="prep_time" placeholder="مثال: 15 دقيقة">
+            <input type="text" name="prep_time" value="{{ recipe.prep_time|default_if_none:'' }}" placeholder="مثال: 15 دقيقة">
           </div>
           <div class="field-group">
             <label>🔥 وقت الطهي *</label>
-            <input type="text" name="cooking_time" placeholder="مثال: 45 دقيقة" required>
+            <input type="text" name="cook_time" value="{{ recipe.cook_time|default_if_none:'' }}" placeholder="مثال: 45 دقيقة" required>
           </div>
         </div>
         <div class="field-group">
           <label>👥 عدد الأشخاص *</label>
-          <input type="text" name="servings" placeholder="مثال: 4-6 أشخاص" required>
+          <input type="text" name="servings" value="{{ recipe.servings|default_if_none:'' }}" placeholder="مثال: 4-6 أشخاص" required>
         </div>
       </div>
 
@@ -385,16 +388,26 @@
         <div class="section-head">
           <div class="icon-orb orb-green">🧂</div>
           <div>
-            <h2>المكونات</h2>
+            <h2>المعلومات المكونات</h2>
             <span>أضف مقادير الوصفة بدقة</span>
           </div>
         </div>
         <div id="ingredients-list">
-          <div class="ing-row">
-            <input type="text" name="ingredient_name" placeholder="اسم المكون">
-            <input type="text" name="ingredient_amount" placeholder="الكمية">
-            <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
-          </div>
+          {% if recipe.ingredients.all %}
+            {% for ing in recipe.ingredients.all %}
+            <div class="ing-row">
+              <input type="text" name="ingredient_name" value="{{ ing.name }}" placeholder="اسم المكون">
+              <input type="text" name="ingredient_amount" value="{{ ing.quantity }}" placeholder="الكمية">
+              <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="ing-row">
+              <input type="text" name="ingredient_name" placeholder="اسم المكون">
+              <input type="text" name="ingredient_amount" placeholder="الكمية">
+              <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+            </div>
+          {% endif %}
         </div>
         <button type="button" class="btn-add-ing" onclick="addIng()">＋ إضافة مكون جديد</button>
       </div>
@@ -411,7 +424,8 @@
         <div class="field-group">
           <label>✍️ الخطوات (كل خطوة في سطر منفصل) *</label>
           <textarea name="instructions" rows="8" placeholder="1. ابدأ بتسخين الفرن...
-2. اخلط المكونات..."></textarea>
+2. اخلط المكونات..." required>{% if recipe.steps.all %}{% for step in recipe.steps.all %}{{ step.description }}{% if not forloop.last %}
+{% endif %}{% endfor %}{% endif %}</textarea>
         </div>
       </div>
 

@@ -208,7 +208,7 @@
             <ul>
                 {% if user.is_authenticated %}
                     <span class="user-greet">مرحباً، {{ user.username }}</span>
-                    <li><a href="{% url 'favorites' %}" class="fav-link">⭐ المفضلات</a></li>
+                    <li><a href="{% url 'profile' %}" class="nav-btn">حسابي</a></li>
                     <li><a href="{% url 'logout' %}" class="logout-btn">خروج</a></li>
                 {% else %}
                     <li><a href="{% url 'login' %}" class="login-link">دخول</a></li>

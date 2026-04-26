@@ -161,23 +161,25 @@
     border: 1px solid var(--border);
     border-radius: 24px;
     overflow: hidden;
-    transition: all 0.3s;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-decoration: none;
     display: block;
     color: var(--text-main);
-    box-shadow: var(--shadow);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     height: 100%;
   }
 
   .recipe-card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-12px) scale(1.03);
     border-color: var(--primary);
+    box-shadow: 0 25px 50px rgba(99, 102, 241, 0.4);
   }
 
   .card-img-wrap {
     position: relative;
     height: 300px;
     padding: 12px;
+    overflow: hidden;
   }
 
   .card-img {
@@ -185,6 +187,11 @@
     height: 100%;
     object-fit: cover;
     border-radius: 18px;
+    transition: transform 0.6s ease;
+  }
+
+  .recipe-card:hover .card-img {
+    transform: scale(1.1) rotate(1deg);
   }
 
   .card-actions {
@@ -322,7 +329,7 @@
           </form>
         </div>
 
-        <a href="{% url 'recipe_detail' r.id %}" class="recipe-card">
+        <div class="recipe-card" onclick="if(!event.target.closest('a') && !event.target.closest('button') && !event.target.closest('form')){ window.location.href='{% url 'recipe_detail' r.id %}'; }" style="cursor: pointer;">
           <div class="card-img-wrap">
             {% if r.image %}
             <img src="{{ r.image.url }}" class="card-img" alt="{{ r.title }}">
@@ -333,6 +340,24 @@
           <div class="card-body">
             <span class="card-category">{{ r.category.name }}</span>
             <h3 class="card-title">{{ r.title }}</h3>
+            
+            <div class="author-info" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+              <a href="{% url 'user_profile' r.author.username %}" style="text-decoration: none; color: var(--primary); font-weight: bold; font-size: 0.95rem; position: relative; z-index: 10;">
+                👤 {{ r.author.username }}
+              </a>
+              {% if user.is_authenticated and user != r.author %}
+              <form action="{% url 'toggle_follow' r.author.username %}" method="POST" style="margin: 0; position: relative; z-index: 10;">
+                  {% csrf_token %}
+                  <button type="submit" style="background: var(--bg-main); border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; padding: 4px 10px; font-size: 0.85rem; font-family: 'Cairo', sans-serif; cursor: pointer; transition: all 0.3s; font-weight: 700;" onmouseover="this.style.background='var(--primary)'; this.style.color='#fff';" onmouseout="this.style.background='var(--bg-main)'; this.style.color='var(--primary)';">
+                      {% if r.author.id in following_ids %}
+                          إلغاء المتابعة
+                      {% else %}
+                          متابعة
+                      {% endif %}
+                  </button>
+              </form>
+              {% endif %}
+            </div>
             
             <div class="card-meta-list">
               <div class="card-meta-item">
@@ -349,7 +374,7 @@
               </div>
             </div>
           </div>
-        </a>
+        </div>
     </div>
     {% endfor %}
   </div>
