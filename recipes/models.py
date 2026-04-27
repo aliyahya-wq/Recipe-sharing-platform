@@ -27,6 +27,7 @@ class Recipe(SoftDeleteMixin):
     description = models.TextField()
     image = models.ImageField(upload_to='recipe_images/')
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL, related_name='recipes')
+    cuisine = models.CharField(max_length=100, blank=True, null=True, verbose_name="المطبخ")
     prep_time = models.PositiveIntegerField()
     cook_time = models.PositiveIntegerField()
     servings = models.PositiveIntegerField()
@@ -39,6 +40,13 @@ class Recipe(SoftDeleteMixin):
 
     def __str__(self):
         return self.title
+
+    @property
+    def average_rating(self):
+        ratings = self.ratings.all()
+        if ratings.exists():
+            return sum(r.score for r in ratings) / ratings.count()
+        return 0
 
 
 class Ingredient(models.Model):
@@ -86,23 +94,17 @@ class Comment(BaseModel, SoftDeleteMixin):
 class Rating(BaseModel):
     SCORE_CHOICES = [(i, str(i)) for i in range(1, 6)]
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ratings')
     score = models.PositiveIntegerField(choices=SCORE_CHOICES)
-
-    class Meta:
-        unique_together = ('user', 'recipe')
 
     def __str__(self):
         return f"{self.score} stars by {self.user}"
 
 
 class Favorite(BaseModel):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorites')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorites', null=True, blank=True)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='favorited_by')
-
-    class Meta:
-        unique_together = ('user', 'recipe')
 
     def __str__(self):
         return f"{self.user} favorites {self.recipe}"
@@ -128,3 +130,14 @@ class Follow(BaseModel):
 
     def __str__(self):
         return f"{self.follower} follows {self.following}"
+
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.name} - {self.subject}"

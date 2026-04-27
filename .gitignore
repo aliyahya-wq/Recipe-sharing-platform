@@ -1,0 +1,22 @@
+# Django
+*.py[cod]
+__pycache__/
+*.so
+.python-version
+
+# Virtual Environments
+venv/
+env/
+.env
+
+# Database
+db.sqlite3
+
+# Media/Static
+media/
+static/
+
+# IDEs
+.vscode/
+.idea/
+.gemini/

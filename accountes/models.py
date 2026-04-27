@@ -45,6 +45,8 @@ class User(AbstractUser, SoftDeleteMixin):
     instagram_link = models.URLField(blank=True)
     twitter_link = models.URLField(blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
+    experience_years = models.PositiveIntegerField(default=0, verbose_name="سنوات الخبرة")
+
 
     objects = SoftDeleteUserManager()
     all_objects = UserManager()

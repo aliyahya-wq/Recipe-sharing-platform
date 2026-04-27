@@ -1,8 +1,152 @@
 {% extends 'baes.html' %}
 
-{% block title %}من نحن - منصة الأكل{% endblock %}
+{% block title %}من نحن - PlatEeat{% endblock %}
 
 {% block content %}
-<h1>من نحن</h1>
-<p>نحن منصة متخصصة في مشاركة الوصفات الشهية.</p>
+<style>
+    .about-page {
+        font-family: 'Cairo', sans-serif;
+        background: #0f172a;
+        min-height: 100vh;
+        direction: rtl;
+        color: #f8fafc;
+    }
+
+    /* ── HERO ── */
+    .about-hero {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        padding: 100px 24px;
+        text-align: center;
+        position: relative;
+        border-bottom: 1px solid #334155;
+    }
+    .about-hero h1 {
+        font-size: clamp(2.5rem, 8vw, 4.5rem);
+        font-weight: 900;
+        background: linear-gradient(135deg, #6366f1, #0ea5e9);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        margin-bottom: 20px;
+    }
+    .about-hero p {
+        color: #94a3b8;
+        font-size: 1.25rem;
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.8;
+    }
+
+    /* ── CONTENT SECTIONS ── */
+    .about-container {
+        max-width: 1100px;
+        margin: -60px auto 80px;
+        padding: 0 24px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .info-card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 40px;
+        padding: 60px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: #fff;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    .section-title::after {
+        content: '';
+        flex: 1;
+        height: 2px;
+        background: linear-gradient(90deg, #6366f1, transparent);
+    }
+
+    .large-description {
+        font-size: 1.15rem;
+        color: #cbd5e1;
+        line-height: 2.1;
+        text-align: justify;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 60px;
+    }
+
+    .feature-item {
+        background: #0f172a;
+        border: 1px solid #334155;
+        padding: 40px;
+        border-radius: 30px;
+        transition: all 0.3s;
+    }
+    .feature-item:hover {
+        transform: translateY(-10px);
+        background: #1e293b;
+        border-color: #6366f1;
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
+    }
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        display: block;
+    }
+    .feature-item h3 {
+        color: #fff;
+        margin-bottom: 15px;
+        font-weight: 800;
+        font-size: 1.4rem;
+    }
+    .feature-item p {
+        color: #94a3b8;
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+</style>
+
+<div class="about-page">
+    <div class="about-hero">
+        <h1 class="animate-up">قصتنا في PlatEeat</h1>
+        <p class="animate-up" style="animation-delay: 0.1s;">نحن أكثر من مجرد منصة وصفات، نحن مجتمع يجمعه حب الطبخ والشغف بالإبداع في المطبخ.</p>
+    </div>
+
+    <div class="about-container animate-up" style="animation-delay: 0.2s;">
+        <div class="info-card">
+            <h2 class="section-title">من نحن</h2>
+            <div class="large-description">
+                منصة <strong>PlatEeat</strong> هي وجهتك الأولى لاكتشاف ومشاركة أسرار المطبخ العربي والعالمي. تأسست المنصة لتكون جسراً يربط بين الطهاة المحترفين والهواة، حيث يمكن للجميع التعبير عن إبداعاتهم ومشاركة تجاربهم الفريدة في عالم الطهي. نحن نؤمن أن الطبخ هو لغة تواصل عالمية، وأن كل وصفة تحمل خلفها قصة، ثقافة، وذكريات جميلة.
+                <br><br>
+                بدأت فكرتنا من ملاحظة الحاجة إلى مكان يجمع الوصفات الموثوقة بتصنيفات دقيقة وتجربة مستخدم متميزة، حيث يسهل الوصول إلى الوصفات حسب الوقت، الصعوبة، أو المكونات. اليوم، نسعى جاهدين لتطوير أدوات ذكية تساعدك في تنظيم مطبخك واكتشاف نكهات جديدة كل يوم.
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-item">
+                    <span class="feature-icon">🌟</span>
+                    <h3>رؤيتنا</h3>
+                    <p>أن نكون المنصة الأكبر والأكثر موثوقية لمشاركة الوصفات في العالم العربي، ملهمين الملايين للعودة إلى المطبخ والإبداع فيه.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🎯</span>
+                    <h3>مهمتنا</h3>
+                    <p>تمكين كل محب للطهي من توثيق وصفاته الخاصة والوصول إلى آلاف الأفكار المبتكرة بسهولة وسرعة، مع الحفاظ على أصالة المذاق.</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🤝</span>
+                    <h3>مجتمعنا</h3>
+                    <p>نحن نعتز بجمهورنا ونشجع على التفاعل الإيجابي، تبادل النصائح، والتقييمات الصادقة التي ترفع من جودة المحتوى للجميع.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
