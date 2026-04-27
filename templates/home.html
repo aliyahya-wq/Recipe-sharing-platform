@@ -1,0 +1,429 @@
+{% extends 'baes.html' %}
+{% block title %}منصة مشاركة الوصفات{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+  .home-page {
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg-main);
+    min-height: 100vh;
+    direction: rtl;
+    color: var(--text-main);
+  }
+
+  /* ── HERO ── */
+  .home-hero {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    padding: 100px 24px 110px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .home-hero h1 {
+    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-weight: 900;
+    color: var(--text-main);
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .home-hero h1 span {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .home-hero p {
+    color: var(--text-dim);
+    font-size: 1.2rem;
+    max-width: 650px;
+    margin: 0 auto 40px;
+    position: relative;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 18px 48px;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    transition: all 0.3s;
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 30px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    margin-top: -30px;
+    position: relative;
+    z-index: 10;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 10px 40px;
+    border-left: 1px solid var(--border);
+  }
+
+  .stat-item:last-child {
+    border-left: none;
+  }
+
+  .stat-num {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--primary-hover);
+    display: block;
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-container {
+    max-width: 1000px;
+    margin: 60px auto 40px;
+    padding: 0 24px;
+  }
+
+  .filter-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    padding: 10px;
+    border-radius: 20px;
+    flex-wrap: wrap;
+  }
+
+  .filter-input-wrap {
+    flex: 2;
+    min-width: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .filter-input-wrap input {
+    flex: 1;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 14px 15px;
+    border-radius: 14px;
+    font-family: 'Cairo';
+    outline: none;
+  }
+
+  .filter-select-wrap select {
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 14px 15px;
+    border-radius: 14px;
+    font-family: 'Cairo';
+  }
+
+  /* ── DARK MODE OVERRIDES ── */
+  body.dark-mode .home-hero {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-bottom: 1px solid #334155;
+  }
+
+  body.dark-mode .home-hero h1 {
+    color: #f8fafc;
+  }
+
+  body.dark-mode .filter-input-wrap input {
+    color: #f8fafc;
+    background: #0f172a;
+  }
+
+  body.dark-mode .filter-select-wrap select {
+    color: #f8fafc;
+    background: #0f172a;
+  }
+
+  body.dark-mode .card-title {
+    color: #f8fafc;
+  }
+
+  /* ── RECIPE GRID ── */
+  .recipes-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+  }
+
+  .recipe-card-wrap {
+    position: relative;
+  }
+
+  .recipe-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-decoration: none;
+    display: block;
+    color: var(--text-main);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    height: 100%;
+  }
+
+  .recipe-card:hover {
+    transform: translateY(-12px) scale(1.03);
+    border-color: var(--primary);
+    box-shadow: 0 25px 50px rgba(99, 102, 241, 0.4);
+  }
+
+  .card-img-wrap {
+    position: relative;
+    height: 300px;
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
+    transition: transform 0.6s ease;
+  }
+
+  .recipe-card:hover .card-img {
+    transform: scale(1.1) rotate(1deg);
+  }
+
+  .card-actions {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 20;
+  }
+
+  .card-action-btn {
+    width: 42px;
+    height: 42px;
+    background: var(--bg-main);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+  }
+
+  .card-action-btn:hover {
+    transform: scale(1.1);
+    border-color: var(--primary);
+  }
+
+  .card-body {
+    padding: 0 25px 25px;
+  }
+
+  .card-category {
+    color: var(--secondary);
+    font-size: 0.9rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 15px;
+    line-height: 1.3;
+  }
+
+  .card-meta-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .card-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+</style>
+
+<div class="home-page">
+  <!-- HERO -->
+  <div class="home-hero">
+    <h1>اكتشف أشهى<br><span>الوصفات العربية</span></h1>
+    <p>استمتع بأفضل الوصفات الموثوقة من قبل آلاف الطهاة وشاركنا إبداعاتك في عالم الطبخ.</p>
+    {% if user.is_authenticated %}
+    <br><a href="{% url 'recipe_add' %}" class="hero-cta">✨ أضف وصفتك الآن</a>
+    {% else %}
+    <a href="{% url 'login' %}" class="hero-cta">🔐 سجل دخولك للإضافة</a>
+    {% endif %}
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-num">{{ recipes.count }}</span>
+      <span class="stat-label">وصفة مضافة</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">{{ all_categories.count }}</span>
+      <span class="stat-label">تصنيف طعام</span>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-container">
+    <div class="filter-row">
+      <div class="filter-input-wrap">
+        <input type="text" id="instant-search" placeholder="ابحث عن وجبة..." onkeyup="filterRecipes()">
+      </div>
+      <div class="filter-select-wrap">
+        <select id="category-filter" onchange="filterRecipes()">
+          <option value="all">كل التصنيفات</option>
+          {% for cat in all_categories %}
+          <option value="{{ cat.name }}">{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="filter-select-wrap">
+        <select id="difficulty-filter" onchange="filterRecipes()">
+          <option value="all">كل المستويات</option>
+          <option value="easy">سهل</option>
+          <option value="medium">متوسط</option>
+          <option value="hard">صعب</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="recipes-grid" id="recipes-grid">
+    {% for r in recipes %}
+    <div class="recipe-card-wrap" data-difficulty="{{ r.difficulty }}">
+        <!-- Actions (Must be outside <a> or handled specifically) -->
+        <div class="card-actions">
+          <form action="{% url 'toggle_favorite' r.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="card-action-btn">
+                {% if r.id|slugify in favorite_ids %}⭐{% else %}🔖{% endif %}
+              </button>
+          </form>
+          <form action="{% url 'toggle_like' r.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="card-action-btn">
+                ❤️
+              </button>
+          </form>
+        </div>
+
+        <div class="recipe-card" onclick="if(!event.target.closest('a') && !event.target.closest('button') && !event.target.closest('form')){ window.location.href='{% url 'recipe_detail' r.id %}'; }" style="cursor: pointer;">
+          <div class="card-img-wrap">
+            {% if r.image %}
+            <img src="{{ r.image.url }}" class="card-img" alt="{{ r.title }}">
+            {% else %}
+            <div style="width:100%; height:100%; background:var(--bg-main); display:flex; align-items:center; justify-content:center; font-size:3rem; border-radius:18px;">🍲</div>
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <span class="card-category">{{ r.category.name }}</span>
+            <h3 class="card-title">{{ r.title }}</h3>
+            
+            <div class="author-info" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+              <a href="{% url 'user_profile' r.author.username %}" style="text-decoration: none; color: var(--primary); font-weight: bold; font-size: 0.95rem; position: relative; z-index: 10;">
+                👤 {{ r.author.username }}
+              </a>
+              {% if user.is_authenticated and user != r.author %}
+              <form action="{% url 'toggle_follow' r.author.username %}" method="POST" style="margin: 0; position: relative; z-index: 10;">
+                  {% csrf_token %}
+                  <button type="submit" style="background: var(--bg-main); border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; padding: 4px 10px; font-size: 0.85rem; font-family: 'Cairo', sans-serif; cursor: pointer; transition: all 0.3s; font-weight: 700;" onmouseover="this.style.background='var(--primary)'; this.style.color='#fff';" onmouseout="this.style.background='var(--bg-main)'; this.style.color='var(--primary)';">
+                      {% if r.author.id in following_ids %}
+                          إلغاء المتابعة
+                      {% else %}
+                          متابعة
+                      {% endif %}
+                  </button>
+              </form>
+              {% endif %}
+            </div>
+            
+            <div class="card-meta-list">
+              <div class="card-meta-item">
+                <span>🕒</span>
+                <span>{{ r.cook_time }} دقيقة</span>
+              </div>
+              <div class="card-meta-item">
+                <span>🌐</span>
+                <span>{{ r.cuisine|default:"المطبخ العام" }}</span>
+              </div>
+              <div class="card-meta-item">
+                <span>🍴</span>
+                <span>تكفي {{ r.servings }} أشخاص</span>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function filterRecipes() {
+    const s = document.getElementById('instant-search').value.toLowerCase();
+    const c = document.getElementById('category-filter').value;
+    const d = document.getElementById('difficulty-filter').value;
+    
+    document.querySelectorAll('.recipe-card-wrap').forEach(card => {
+      const title = card.querySelector('.card-title').innerText.toLowerCase();
+      const cat = card.querySelector('.card-category').innerText.trim();
+      const diff = card.getAttribute('data-difficulty');
+      
+      const mS = title.includes(s);
+      const mC = c === 'all' || cat === c;
+      const mD = d === 'all' || diff === d || 
+                 (d === 'easy' && (diff === 'easy' || diff === 'سهل')) ||
+                 (d === 'medium' && (diff === 'medium' || diff === 'متوسط')) ||
+                 (d === 'hard' && (diff === 'hard' || diff === 'صعب'));
+      
+      card.style.display = (mS && mC && mD) ? 'block' : 'none';
+    });
+  }
+</script>
+{% endblock %}

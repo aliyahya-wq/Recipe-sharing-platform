@@ -1,0 +1,213 @@
+{% extends 'baes.html' %}
+
+{% block title %}تحديث بيانات الحساب - PlatEeat{% endblock %}
+
+{% block content %}
+<style>
+    .auth-page {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 150px);
+        padding: 60px 24px;
+        background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.1), transparent),
+            radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.1), transparent);
+    }
+
+    .auth-card {
+        background: var(--bg-card);
+        width: 100%;
+        max-width: 500px;
+        padding: 50px;
+        border-radius: 32px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .auth-header h1 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: var(--text-main);
+        margin-bottom: 10px;
+    }
+
+    .auth-header p {
+        color: var(--text-dim);
+        font-size: 1rem;
+    }
+
+    /* ── FORM STYLING ── */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text-dim);
+    }
+
+    form input,
+    form select,
+    form textarea {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--bg-main);
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        color: var(--text-main);
+        font-family: 'Cairo';
+        font-size: 0.95rem;
+        outline: none;
+        transition: all 0.3s;
+    }
+
+    form input:focus, form textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        background: var(--bg-card);
+    }
+
+    .helptext,
+    .help-block {
+        display: block;
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 5px;
+        line-height: 1.4;
+    }
+
+    .errorlist {
+        list-style: none;
+        color: #fca5a5;
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        background: rgba(153, 27, 27, 0.2);
+        border-radius: 8px;
+        border: 1px solid rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-auth {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(90deg, #0ea5e9, #6366f1);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-family: 'Cairo';
+        font-size: 1.1rem;
+        font-weight: 900;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 15px;
+        box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-auth:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 20px -5px rgba(99, 102, 241, 0.5);
+    }
+
+    /* ── ANIMATIONS ── */
+    .animate-card {
+        animation: cardEnter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes cardEnter {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    /* Styling for File Input */
+    form input[type="file"] {
+        padding: 8px;
+        background: rgba(99, 102, 241, 0.1);
+        border: 2px dashed #334155;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+    form input[type="file"]:hover {
+        border-color: #6366f1;
+    }
+</style>
+
+<div class="auth-page">
+    <div class="auth-card animate-card" style="max-width: 600px; padding: 40px;">
+        <div class="auth-header" style="margin-bottom: 25px;">
+            <h1 style="font-size: 1.8rem;">تحديث الحساب ⚙️</h1>
+            <p style="font-size: 0.9rem;">قم بتعديل بيانات حسابك وصورتك الشخصية لتبقى دائماً في أفضل حلة</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.errors and form.non_field_errors %}
+            <div class="error-container">
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-group {% if field.name == 'bio' or field.name == 'profile_picture' or 'link' in field.name %}full-width{% endif %}">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <span class="helptext">{{ field.help_text|safe }}</span>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div class="errorlist">
+                        {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn-auth">تحديث البيانات ✔️</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

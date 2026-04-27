@@ -1,0 +1,498 @@
+{% extends 'baes.html' %}
+
+{% block title %}{{ recipe.title }} - PlatEeat{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+    .recipe-detail-container {
+        font-family: 'Cairo', sans-serif;
+        background: var(--bg-main);
+        min-height: 100vh;
+        direction: rtl;
+        padding-bottom: 80px;
+        color: var(--text-main);
+    }
+
+    .recipe-header {
+        background: var(--bg-main);
+        padding: 60px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header-content {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .header-image {
+        flex: 1;
+        min-width: 300px;
+        height: 500px;
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+    }
+
+    .header-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .recipe-cat {
+        color: var(--secondary);
+        font-weight: 800;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .recipe-title {
+        font-size: 3rem;
+        font-weight: 900;
+        color: var(--text-main);
+        margin-bottom: 25px;
+        line-height: 1.2;
+    }
+
+    .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .meta-box {
+        background: var(--bg-card);
+        padding: 20px;
+        border-radius: 20px;
+        text-align: center;
+        border: 1px solid var(--border);
+    }
+
+    .meta-label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    .meta-value {
+        font-weight: 800;
+        color: var(--text-main);
+        font-size: 1.05rem;
+    }
+
+    .author-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: var(--bg-card);
+        border-radius: 24px;
+        border: 1px solid var(--border);
+    }
+
+    .author-img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--primary);
+    }
+
+    .author-info h4 {
+        margin: 0;
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--text-main);
+    }
+
+    .author-info span {
+        color: var(--text-dim);
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .action-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 40px;
+    }
+
+    .action-btn {
+        width: 55px;
+        height: 55px;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: var(--bg-card);
+        color: var(--text-dim);
+    }
+
+    .action-btn.active {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+        border-color: #ef4444;
+    }
+
+    .action-btn:hover {
+        background: var(--primary);
+        color: var(--text-main);
+        border-color: var(--primary);
+        transform: translateY(-3px);
+    }
+
+    .content-body {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 24px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 50px;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--text-main);
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .ingredients-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        background: var(--bg-card);
+        padding: 30px;
+        border-radius: 32px;
+        border: 1px solid var(--border);
+        max-width: 800px;
+    }
+
+    .ingredient-item {
+        display: flex;
+        align-items: center;
+        background: var(--bg-main);
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        transition: all 0.2s;
+    }
+
+    .ingredient-item:hover {
+        border-color: var(--primary);
+    }
+
+    .ing-check-wrap {
+        padding: 0 20px;
+    }
+
+    .ing-quantity-wrap {
+        background: rgba(99, 102, 241, 0.1);
+        padding: 15px 25px;
+        border-left: 1px solid var(--border);
+        min-width: 140px;
+        text-align: center;
+        color: var(--secondary);
+        font-weight: 900;
+        font-size: 1.1rem;
+    }
+
+    .ing-name-wrap {
+        padding: 15px 25px;
+        flex: 1;
+        color: var(--text-main);
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .ing-label {
+        display: block;
+        font-size: 0.7rem;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        margin-bottom: 2px;
+        font-weight: 800;
+    }
+
+    .check-box {
+        width: 26px;
+        height: 26px;
+        border: 2px solid var(--primary);
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .check-box.checked {
+        background: var(--primary);
+    }
+
+    .check-box.checked::after {
+        content: '✓';
+        color: white;
+        font-weight: 900;
+        font-size: 1rem;
+    }
+
+    .steps-container {
+        background: var(--bg-card);
+        padding: 45px;
+        border-radius: 32px;
+        border: 1px solid var(--border);
+    }
+
+    .method-text {
+        line-height: 1.8;
+        font-size: 1.15rem;
+        color: var(--text-dim);
+        white-space: pre-line;
+    }
+
+    .serving-adjuster {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: var(--bg-main);
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-weight: 800;
+        border: 1px solid var(--border);
+    }
+
+    .adj-btn {
+        width: 32px;
+        height: 32px;
+        background: var(--bg-card);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        color: var(--text-main);
+    }
+
+    .stars {
+        display: flex;
+        gap: 6px;
+        color: #fbbf24;
+        font-size: 1.6rem;
+        margin-bottom: 25px;
+    }
+</style>
+
+<div class="recipe-detail-container">
+    <div class="recipe-header">
+        <div class="header-content">
+            <span class="recipe-cat">{{ recipe.category.name }}</span>
+            <h1 class="recipe-title">{{ recipe.title }}</h1>
+            
+            <form action="{% url 'rate_recipe' recipe.id %}" method="POST" id="starForm">
+                {% csrf_token %}
+                <input type="hidden" name="rating" id="ratingValue">
+                <div class="stars">
+                    {% for i in "12345" %}
+                    <span class="star-btn" style="cursor:pointer; {% if avg_rating >= forloop.counter|add:0 %}color:#fbbf24;{% else %}color:var(--border);{% endif %}" onclick="submitRate({{ forloop.counter }})">★</span>
+                    {% endfor %}
+                    <span style="color: var(--text-dim); font-size: 0.95rem; margin-right: 12px; font-weight: 700;">({{ rating_count }} تقييم)</span>
+                </div>
+            </form>
+
+            <div class="meta-grid">
+                <div class="meta-box">
+                    <span class="meta-label">وقت الطبخ</span>
+                    <span class="meta-value">🕒 {{ recipe.cook_time }} دقيقة</span>
+                </div>
+                <div class="meta-box">
+                    <span class="meta-label">المطبخ</span>
+                    <span class="meta-value">🌐 {{ recipe.cuisine|default:"المطبخ العام" }}</span>
+                </div>
+                <div class="meta-box">
+                    <span class="meta-label">درجة الصعوبة</span>
+                    <span class="meta-value">
+                        {% if recipe.difficulty == 'easy' or recipe.difficulty == 'سهل' %}🟢 سهل{% elif recipe.difficulty == 'medium' or recipe.difficulty == 'متوسط' %}🟡 متوسط{% else %}🔴 صعب{% endif %}
+                    </span>
+                </div>
+                <div class="meta-box">
+                    <span class="meta-label">الحصة</span>
+                    <span class="meta-value">👥 تكفي {{ recipe.servings }} أشخاص</span>
+                </div>
+            </div>
+
+            <div class="author-section">
+                {% if recipe.author.profile_picture %}
+                <img src="{{ recipe.author.profile_picture.url }}" class="author-img" alt="{{ recipe.author.username }}">
+                {% else %}
+                <div style="width:60px; height:60px; border-radius:50%; background:var(--bg-main); display:flex; align-items:center; justify-content:center; font-size:1.8rem; border: 2px solid var(--primary);">👨‍🍳</div>
+                {% endif %}
+                <div class="author-info">
+                    <h4><a href="{% url 'user_profile' recipe.author.username %}" style="color: inherit; text-decoration:none;">{{ recipe.author.username }}</a></h4>
+                    <span>مؤلف الوصفة • خبرة {{ recipe.author.experience_years }} سنوات</span>
+                </div>
+            </div>
+
+            <div class="action-row">
+                <form action="{% url 'toggle_like' recipe.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn {% if is_liked %}active{% endif %}" title="إعجاب">🧡</button>
+                </form>
+                <form action="{% url 'toggle_favorite' recipe.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn {% if is_favorite %}active{% endif %}" style="color: {% if is_favorite %}#fbbf24{% else %}var(--text-dim){% endif %}; border-color: {% if is_favorite %}#fbbf24{% else %}var(--border){% endif %}; background: {% if is_favorite %}rgba(251, 191, 36, 0.1){% else %}var(--bg-card){% endif %};" title="حفظ">🔖</button>
+                </form>
+                {% if user.is_authenticated and recipe.author != user %}
+                <form action="{% url 'toggle_follow' recipe.author.username %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="action-btn {% if is_following %}active{% endif %}" style="min-width:auto; padding:0 14px; font-size:0.95rem;">
+                        {% if is_following %}إلغاء متابعة{% else %}تابع{% endif %}
+                    </button>
+                </form>
+                {% elif not user.is_authenticated %}
+                <a href="{% url 'login' %}" class="action-btn" style="padding:0 14px;">تابع</a>
+                {% endif %}
+                <div class="action-btn" onclick="window.print()" title="طباعة">🖨️</div>
+            </div>
+        </div>
+
+        <div class="header-image">
+            {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}">
+            {% else %}
+            <div style="width:100%; height:100%; background:var(--bg-card); display:flex; align-items:center; justify-content:center; font-size:6rem;">🍲</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="content-body">
+        <div class="ingredients-section">
+            <div class="section-title">
+                المكونات
+                <div class="serving-adjuster">
+                    <div class="adj-btn">-</div>
+                    <span>{{ recipe.servings }} أشخاص</span>
+                    <div class="adj-btn">+</div>
+                </div>
+            </div>
+            <div class="ingredients-grid">
+                {% for ingredient in recipe.ingredients.all %}
+                <div class="ingredient-item">
+                    <div class="ing-check-wrap">
+                        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+                    </div>
+                    <div class="ing-quantity-wrap">
+                        <span class="ing-label">المقدار</span>
+                        {{ ingredient.quantity }}
+                    </div>
+                    <div class="ing-name-wrap">
+                        <span class="ing-label">المكون</span>
+                        {{ ingredient.name }}
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: var(--text-dim);">لا توجد مكونات مضافة.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="method-section">
+            <h2 class="section-title">طريقة التحضير</h2>
+            <div class="steps-container">
+                <p class="method-text">{{ recipe.description }}</p>
+                
+                {% for step in recipe.steps.all %}
+                <div style="margin-bottom: 40px; padding-top: 30px; border-top: 1px solid var(--border);">
+                    <h3 style="font-weight: 900; color: var(--primary); margin-bottom: 15px;">الخطوة {{ step.order }}</h3>
+                    <p class="method-text">{{ step.description }}</p>
+                    {% if step.image %}
+                    <img src="{{ step.image.url }}" style="max-width: 100%; border-radius: 24px; margin-top: 20px; border: 1px solid var(--border);">
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="comments-section">
+            <h2 class="section-title">التعليقات والردود</h2>
+            <div class="steps-container">
+                {% for comment in comments %}
+                <div style="margin-bottom: 40px; padding: 25px; border-bottom: 1px solid var(--border);">
+                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 15px;">
+                        <strong style="color:var(--primary); font-size: 1.1rem;">{{ comment.user.username }}</strong>
+                        <span style="font-size: 0.85rem; color: var(--text-dim);">{{ comment.created_at|date:"Y/m/d" }}</span>
+                    </div>
+                    <p style="color: var(--text-main); font-size: 1.05rem;">{{ comment.text }}</p>
+                    
+                    {% for reply in comment.replies.all %}
+                    <div style="margin-right: 40px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 16px; margin-top: 15px; border-right: 4px solid var(--primary);">
+                        <strong style="color:var(--secondary);">رد:</strong> {{ reply.text }}
+                    </div>
+                    {% endfor %}
+
+                    {% if user.is_authenticated %}
+                    <button onclick="document.getElementById('reply-box-{{comment.id}}').style.display='block'" style="background:none; border:none; color:var(--secondary); cursor:pointer; margin-top:12px; font-size: 0.9rem; font-weight:800;">↩️ أضف رداً</button>
+                    <div id="reply-box-{{comment.id}}" style="display:none; margin-top:15px;">
+                        <form action="{% url 'add_reply' recipe.id comment.id %}" method="POST">
+                            {% csrf_token %}
+                            <div style="display:flex; gap:12px;">
+                                <input type="text" name="reply" style="flex:1; background:var(--bg-main); border:1px solid var(--border); color:var(--text-main); padding:12px; border-radius:12px; font-family:'Cairo';" placeholder="اكتب ردك..." required>
+                                <button type="submit" style="background:var(--primary); color:#fff; border:none; padding:12px 25px; border-radius:12px; font-weight:800; cursor:pointer;">رد</button>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p style="color: var(--text-dim);">لا توجد تعليقات بعد.</p>
+                {% endfor %}
+
+                {% if user.is_authenticated %}
+                <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid var(--border);">
+                    <h3 style="font-weight: 900; margin-bottom: 25px;">أضف تعليقك ✨</h3>
+                    <form action="{% url 'add_comment' recipe.id %}" method="POST">
+                        {% csrf_token %}
+                        <textarea name="comment" style="width:100%; background:var(--bg-main); border:1px solid var(--border); color:var(--text-main); padding:20px; border-radius:20px; font-family:'Cairo';" rows="5" placeholder="ما رأيك في هذه الوصفة؟" required></textarea>
+                        <button type="submit" style="width:100%; background:var(--primary); color:#fff; border:none; padding:18px; border-radius:16px; font-weight:900; cursor:pointer; margin-top: 15px; font-size: 1.1rem;">نشر التعليق</button>
+                    </form>
+                </div>
+                {% else %}
+                <div style="text-align:center; padding:40px; background:rgba(255,255,255,0.02); border-radius:24px; margin-top:40px; border: 1px dashed var(--border);">
+                    <p style="color:var(--text-dim); margin-bottom:20px;">يجب عليك تسجيل الدخول للمشاركة في التعليقات</p>
+                    <a href="{% url 'login' %}" style="background:var(--primary); color:#fff; padding:12px 40px; border-radius:12px; text-decoration:none; font-weight:900;">تسجيل الدخول 🔐</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  function submitRate(v) {
+    document.getElementById('ratingValue').value = v;
+    document.getElementById('starForm').submit();
+  }
+</script>
+{% endblock %}

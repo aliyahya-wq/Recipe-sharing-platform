@@ -1,0 +1,463 @@
+{% extends 'baes.html' %}
+{% block title %}إضافة وصفة جديدة - PlatEeat{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+  .add-page {
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg-main);
+    min-height: 100vh;
+    direction: rtl;
+    padding-bottom: 100px;
+    color: var(--text-main);
+  }
+
+  /* ── HERO HEADER ── */
+  .add-hero {
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-main) 100%);
+    padding: 80px 24px 100px;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .add-hero .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(99, 102, 241, 0.1);
+    color: #818cf8;
+    font-size: .85rem;
+    font-weight: 800;
+    padding: 8px 24px;
+    border-radius: 30px;
+    margin-bottom: 24px;
+    border: 1.5px solid rgba(99, 102, 241, 0.2);
+  }
+
+  .add-hero h1 {
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, #6366f1, #0ea5e9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+  }
+
+  .add-hero p {
+    color: var(--text-dim);
+    font-size: 1.15rem;
+  }
+
+  /* ── FORM WRAPPER ── */
+  .form-wrap {
+    max-width: 900px;
+    margin: -60px auto 0;
+    padding: 0 24px;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* ── SECTION CARD ── */
+  .form-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 32px;
+    padding: 40px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+  }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 35px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .section-head .icon-orb {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #fff;
+  }
+
+  .orb-purple {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+  }
+
+  .orb-cyan {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  }
+
+  .orb-orange {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+
+  .orb-pink {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+  }
+
+  .orb-green {
+    background: linear-gradient(135deg, #10b981, #059669);
+  }
+
+  .section-head h2 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text-main);
+  }
+
+  .section-head span {
+    font-size: .85rem;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin-top: 3px;
+  }
+
+  /* ── FORM FIELDS ── */
+  .field-group {
+    margin-bottom: 25px;
+  }
+
+  .field-group label {
+    display: block;
+    font-size: .95rem;
+    font-weight: 800;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  .field-group input,
+  .field-group textarea,
+  .field-group select {
+    width: 100%;
+    background: var(--bg-main);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    color: var(--text-main);
+    font-family: 'Cairo';
+    font-size: 1rem;
+    padding: 16px 20px;
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  .field-group input:focus,
+  .field-group textarea:focus,
+  .field-group select:focus {
+    border-color: #6366f1;
+    background: #1e293b;
+    box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.2);
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media(max-width:600px) {
+    .field-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ── IMAGE UPLOAD ── */
+  .image-upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 20px;
+    padding: 50px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: var(--bg-main);
+    position: relative;
+  }
+
+  .image-upload-zone:hover {
+    border-color: var(--primary);
+    background: var(--bg-card);
+  }
+
+  .image-upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .upload-icon {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    opacity: 0.5;
+  }
+
+  .upload-text {
+    color: #94a3b8;
+    font-size: 1.05rem;
+  }
+
+  .upload-text strong {
+    color: #818cf8;
+  }
+
+  /* ── INGREDIENTS ── */
+  .ing-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 45px;
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .btn-remove {
+    width: 45px;
+    height: 45px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 12px;
+    color: #f87171;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+
+  .btn-add-ing {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 2px dashed #6366f1;
+    border-radius: 16px;
+    color: #818cf8;
+    padding: 14px 30px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-add-ing:hover {
+    background: #6366f1;
+    color: #fff;
+    transform: translateY(-3px);
+  }
+
+  /* ── SUBMIT ── */
+  .btn-submit {
+    width: 100%;
+    background: linear-gradient(90deg, #6366f1, #0ea5e9);
+    color: #fff;
+    border: none;
+    padding: 22px;
+    border-radius: 24px;
+    font-family: 'Cairo';
+    font-size: 1.3rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 15px 35px rgba(99, 102, 241, 0.4);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 45px rgba(99, 102, 241, 0.5);
+  }
+</style>
+
+<div class="add-page">
+  <div class="add-hero animate-up">
+    <div class="badge">👨‍🍳 شاركنا إبداعك</div>
+    <h1>{% if recipe %}تعديل الوصفة{% else %}أضف وصفة جديدة{% endif %}</h1>
+    <p>حوّل وصفتك السرية إلى تحفة فنية يراها الجميع</p>
+  </div>
+
+  <div class="form-wrap animate-up" style="animation-delay: 0.1s;">
+    <form method="POST" enctype="multipart/form-data" id="recipeForm">
+      {% csrf_token %}
+
+      <!-- ① المعلومات الأساسية -->
+      <div class="form-section">
+        <div class="section-head">
+          <div class="icon-orb orb-purple">📝</div>
+          <div>
+            <h2>المعلومات الأساسية</h2>
+            <span>اسم الوصفة والوصف المختصر</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>🍽️ اسم الوصفة *</label>
+          <input type="text" name="title" value="{{ recipe.title|default_if_none:'' }}" placeholder="مثال: منسف لحم بلدي فاخر" required>
+        </div>
+        <div class="field-group">
+          <label>📖 نبذة عن الوصفة *</label>
+          <textarea name="description" placeholder="اكتب وصفاً قصيراً وشهياً لوصفتك..." required>{{ recipe.description|default_if_none:'' }}</textarea>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>🏷️ التصنيف *</label>
+            <select name="category" required style="background: #0f172a; border: 2px solid #6366f1; color: #fff; border-radius: 16px; padding: 16px 20px; width: 100%; cursor: pointer; font-family: 'Cairo'; font-weight: 700; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236366f1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: left 1rem center; background-size: 1em auto;">
+              <option value="" disabled {% if not recipe %}selected{% endif %}>اختر تصنيفاً للوجبة...</option>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}" {% if recipe and recipe.category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="field-group">
+            <label>🌐 المطبخ</label>
+            <input type="text" name="cuisine" value="{{ recipe.cuisine|default_if_none:'' }}" placeholder="مثال: سعودي، مصري، عالمي...">
+          </div>
+          <div class="field-group">
+            <label>📊 مستوى الصعوبة</label>
+            <select name="difficulty">
+              <option value="سهل" {% if recipe.difficulty == 'سهل' %}selected{% endif %}>🟢 سهل</option>
+              <option value="متوسط" {% if not recipe or recipe.difficulty == 'متوسط' %}selected{% endif %}>🟡 متوسط</option>
+              <option value="صعب" {% if recipe.difficulty == 'صعب' %}selected{% endif %}>🔴 صعب</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② صورة الوصفة -->
+      <div class="form-section">
+        <div class="section-head">
+          <div class="icon-orb orb-cyan">🖼️</div>
+          <div>
+            <h2>صورة الوصفة</h2>
+            <span>اختر صورة شهية تجذب الجميع</span>
+          </div>
+        </div>
+        <div class="image-upload-zone" onclick="document.getElementById('imageInput').click()">
+          <input type="file" name="image" id="imageInput" accept="image/*" style="display:none;" onchange="previewImage(this)">
+          {% if recipe and recipe.image %}
+          <div id="uploadPlaceholder" style="display:none;">
+            <div class="upload-icon">📸</div>
+            <div class="upload-text">انقر هنا لاختيار <strong>صورة شهية</strong> لوصفتك</div>
+          </div>
+          <img id="imagePreview" src="{{ recipe.image.url }}" style="display:block; width:100%; border-radius:15px; margin-top:10px;">
+          {% else %}
+          <div id="uploadPlaceholder">
+            <div class="upload-icon">📸</div>
+            <div class="upload-text">انقر هنا لاختيار <strong>صورة شهية</strong> لوصفتك</div>
+          </div>
+          <img id="imagePreview" style="display:none; width:100%; border-radius:15px; margin-top:10px;">
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ③ التوقيت والأشخاص -->
+      <div class="form-section">
+        <div class="section-head">
+          <div class="icon-orb orb-orange">⏱️</div>
+          <div>
+            <h2>التوقيت والتقديم</h2>
+            <span>كم يستغرق التحضير ولكم شخص؟</span>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>⏱️ وقت التحضير</label>
+            <input type="text" name="prep_time" value="{{ recipe.prep_time|default_if_none:'' }}" placeholder="مثال: 15 دقيقة">
+          </div>
+          <div class="field-group">
+            <label>🔥 وقت الطهي *</label>
+            <input type="text" name="cook_time" value="{{ recipe.cook_time|default_if_none:'' }}" placeholder="مثال: 45 دقيقة" required>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>👥 عدد الأشخاص *</label>
+          <input type="text" name="servings" value="{{ recipe.servings|default_if_none:'' }}" placeholder="مثال: 4-6 أشخاص" required>
+        </div>
+      </div>
+
+      <!-- ④ المكونات -->
+      <div class="form-section">
+        <div class="section-head">
+          <div class="icon-orb orb-green">🧂</div>
+          <div>
+            <h2>المعلومات المكونات</h2>
+            <span>أضف مقادير الوصفة بدقة</span>
+          </div>
+        </div>
+        <div id="ingredients-list">
+          {% if recipe.ingredients.all %}
+            {% for ing in recipe.ingredients.all %}
+            <div class="ing-row">
+              <input type="text" name="ingredient_name" value="{{ ing.name }}" placeholder="اسم المكون">
+              <input type="text" name="ingredient_amount" value="{{ ing.quantity }}" placeholder="الكمية">
+              <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="ing-row">
+              <input type="text" name="ingredient_name" placeholder="اسم المكون">
+              <input type="text" name="ingredient_amount" placeholder="الكمية">
+              <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+            </div>
+          {% endif %}
+        </div>
+        <button type="button" class="btn-add-ing" onclick="addIng()">＋ إضافة مكون جديد</button>
+      </div>
+
+      <!-- ⑤ شرح الوصفة -->
+      <div class="form-section">
+        <div class="section-head">
+          <div class="icon-orb orb-pink">📜</div>
+          <div>
+            <h2>طريقة التحضير</h2>
+            <span>اكتب خطواتك بوضوح</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>✍️ الخطوات (كل خطوة في سطر منفصل) *</label>
+          <textarea name="instructions" rows="8" placeholder="1. ابدأ بتسخين الفرن...
+2. اخلط المكونات..." required>{% if recipe.steps.all %}{% for step in recipe.steps.all %}{{ step.description }}{% if not forloop.last %}
+{% endif %}{% endfor %}{% endif %}</textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">
+        <span>🚀</span> عرض الوصفة ونشرها
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function previewImage(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('imagePreview').src = e.target.result;
+        document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('uploadPlaceholder').style.display = 'none';
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function addIng() {
+    const div = document.createElement('div');
+    div.className = 'ing-row';
+    div.innerHTML = `
+      <input type="text" name="ingredient_name" placeholder="اسم المكون">
+      <input type="text" name="ingredient_amount" placeholder="الكمية">
+      <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+    `;
+    document.getElementById('ingredients-list').appendChild(div);
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block page_title %}لوحة القيادة{% endblock %}
+
+{% block dashboard_content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Stats Cards -->
+<div class="card-grid">
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>{{ stats.total_users }}</h3>
+            <p>إجمالي المستخدمين</p>
+        </div>
+        <div class="stat-icon" style="color: #6366f1; background-color: #eef2ff;">
+            <i class="fas fa-users"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>{{ stats.total_recipes }}</h3>
+            <p>الوصفات المنشورة</p>
+        </div>
+        <div class="stat-icon" style="color: #f59e0b; background-color: #fffbeb;">
+            <i class="fas fa-utensils"></i>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-info">
+            <h3>{{ stats.total_comments }}</h3>
+            <p>التعليقات الجديدة</p>
+        </div>
+        <div class="stat-icon" style="color: #10b981; background-color: #ecfdf5;">
+            <i class="fas fa-comments"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+    <div class="table-container">
+        <h3 style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); font-size: 1.125rem;">نشاط المنصة (آخر 30 يوم)</h3>
+        <div style="padding: 24px; height: 350px;">
+            <canvas id="activityChart"></canvas>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h3 style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); font-size: 1.125rem;">توزيع التصنيفات</h3>
+        <div style="padding: 24px; height: 350px;">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+    <!-- Popular Recipes -->
+    <div class="table-container">
+        <h3>أكثر الوصفات شعبية</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>الوصفة</th>
+                    <th>الإعجابات</th>
+                    <th>الناشر</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for recipe in stats.popular_recipes %}
+                <tr>
+                    <td style="font-weight: 600;">{{ recipe.title }}</td>
+                    <td>
+                        <span class="status-badge" style="background-color: #fef2f2; color: #ef4444;">
+                            <i class="fas fa-heart"></i> {{ recipe.total_likes|default:"0" }}
+                        </span>
+                    </td>
+                    <td>{{ recipe.author.username }}</td>
+                    <td>
+                        <a href="{% url 'home' %}" class="action-btn" title="عرض">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">لا توجد بيانات حالياً</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Recent Users -->
+    <div class="table-container">
+        <h3>آخر المشتركين</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>المستخدم</th>
+                    <th>تاريخ الانضمام</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in stats.recent_users %}
+                <tr>
+                    <td style="font-weight: 600;">{{ user.username }}</td>
+                    <td>{{ user.date_joined|date:"d M Y" }}</td>
+                    <td>
+                        {% if user.is_active %}
+                        <span class="status-badge status-active">نشط</span>
+                        {% else %}
+                        <span class="status-badge status-inactive">محظور</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="text-align: center; color: var(--text-muted);">لا توجد بيانات حالياً</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Category Pie Chart
+    const ctxPie = document.getElementById('categoryChart').getContext('2d');
+    new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: {{ stats.category_labels | safe }},
+            datasets: [{
+                data: {{ stats.category_data | safe }},
+                backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'],
+                borderWidth: 4,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { font: { family: 'Cairo', weight: '600' } } } },
+            cutout: '70%'
+        }
+    });
+
+    // Activity Line Chart
+    const ctxLine = document.getElementById('activityChart').getContext('2d');
+    new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: ['1 م', '5 م', '10 م', '15 م', '20 م', '25 م', '30 م'],
+            datasets: [{
+                label: 'المستخدمين الجدد',
+                data: [5, 12, 8, 15, 22, 18, 25],
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#4f46e5'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { borderDash: [5, 5], drawBorder: false } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}
