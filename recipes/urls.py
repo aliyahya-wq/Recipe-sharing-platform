@@ -14,5 +14,8 @@ urlpatterns = [
     path('favorite/<str:recipe_id>/', views.toggle_favorite, name='toggle_favorite'),
     path('like/<str:recipe_id>/', views.toggle_like, name='toggle_like'),
     path('favorites/', views.favorites_list, name='favorites'),
+    path('liked/', views.user_liked_recipes, name='user_liked_recipes'),
+    path('edit/<str:recipe_id>/', views.edit_recipe, name='edit_recipe'),
+    path('delete/<str:recipe_id>/', views.delete_recipe, name='delete_recipe'),
 ]
 

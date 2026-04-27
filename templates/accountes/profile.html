@@ -1,0 +1,409 @@
+{% extends 'baes.html' %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+    .profile-page {
+        font-family: 'Cairo', sans-serif;
+        background: var(--bg-main);
+        min-height: 100vh;
+        direction: rtl;
+        padding: 60px 24px;
+        color: var(--text-main);
+    }
+    
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .profile-header {
+        display: grid;
+        gap: 30px;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        margin-bottom: 40px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 32px;
+        padding: 40px;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 8px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    .profile-avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 30px;
+        overflow: hidden;
+        border: 3px solid var(--primary);
+        background: var(--bg-main);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .profile-info h1 {
+        margin: 0;
+        font-size: 2.8rem;
+        font-weight: 900;
+        color: var(--text-main);
+    }
+
+    .profile-info p {
+        margin: 10px 0;
+        line-height: 1.8;
+        color: var(--text-dim);
+        font-size: 1.1rem;
+        max-width: 800px;
+    }
+
+    .profile-stats {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 25px;
+    }
+
+    .profile-stat {
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 20px 25px;
+        min-width: 150px;
+        text-align: center;
+        transition: transform 0.3s;
+    }
+
+    .profile-stat:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+    }
+
+    .profile-stat h3 {
+        margin: 0 0 10px;
+        font-size: 1rem;
+        color: var(--text-dim);
+    }
+
+    .profile-stat span {
+        font-size: 2.2rem;
+        font-weight: 900;
+        color: var(--primary);
+        display: block;
+    }
+
+    /* ── RECIPE CARDS (Matched with home.html) ── */
+    .recipes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    .recipe-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none;
+        display: block;
+        color: var(--text-main);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .recipe-card:hover {
+        transform: translateY(-12px) scale(1.03);
+        border-color: var(--primary);
+        box-shadow: 0 25px 50px rgba(99, 102, 241, 0.4);
+    }
+
+    .card-img-wrap {
+        position: relative;
+        height: 250px;
+        padding: 12px;
+        overflow: hidden;
+    }
+
+    .card-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 18px;
+        transition: transform 0.6s ease;
+    }
+
+    .recipe-card:hover .card-img {
+        transform: scale(1.1) rotate(1deg);
+    }
+
+    .card-body {
+        padding: 0 25px 25px;
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: var(--text-main);
+        margin: 10px 0 15px;
+        line-height: 1.3;
+    }
+
+    .card-desc {
+        color: var(--text-dim);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+
+    .empty-state {
+        padding: 60px;
+        text-align: center;
+        background: var(--bg-card);
+        border: 1px dashed var(--border);
+        border-radius: 32px;
+        margin-top: 30px;
+    }
+
+    .empty-state h3 {
+        color: var(--text-main);
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 36px;
+        border-radius: 16px;
+        background: var(--primary);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 800;
+        font-size: 1.1rem;
+        margin-top: 20px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-action:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(99, 102, 241, 0.6);
+        background: var(--primary-hover);
+    }
+
+    .btn-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        box-shadow: none;
+    }
+    .btn-danger:hover {
+        background: #ef4444;
+        color: #fff;
+        box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-outline {
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        box-shadow: none;
+    }
+    .btn-outline:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: var(--bg-card);
+    }
+
+    .user-lists {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        margin-top: 38px;
+    }
+    .user-list-box {
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 24px;
+    }
+    .user-list-box h3 {
+        margin: 0 0 16px;
+        font-size: 1.1rem;
+        color: var(--text-main);
+        font-weight: 800;
+    }
+    .user-pill-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .user-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 999px;
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 800;
+        transition: all 0.2s;
+    }
+    .user-pill:hover {
+        background: var(--primary);
+        color: #fff;
+        transform: scale(1.05);
+    }
+    .empty-text {
+        margin: 0;
+        color: var(--text-dim);
+    }
+</style>
+
+<section class="profile-page">
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                {% if profile_user.profile_picture %}
+                    <img src="{{ profile_user.profile_picture.url }}" alt="{{ profile_user.username }}">
+                {% else %}
+                    <span style="font-size: 4rem; font-weight:900; color: var(--primary);">{{ profile_user.username|first|upper }}</span>
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h1>{% if is_own_profile %}حسابي{% else %}الشيف {{ profile_user.username }}{% endif %}</h1>
+                    {% if is_own_profile %}
+                    <a href="{% url 'edit_profile' %}" class="btn-action btn-outline" style="margin-top:0; padding:10px 20px; font-size:1rem;">⚙️ تعديل الحساب</a>
+                    {% endif %}
+                </div>
+                {% if profile_user.bio %}
+                    <p>{{ profile_user.bio }}</p>
+                {% else %}
+                    <p>مرحباً بك في صفحة الحساب. هنا يمكنك الاطلاع على معلومات المستخدم والوصفات المنشورة بكل إبداع.</p>
+                {% endif %}
+
+                {% if not is_own_profile %}
+                <div style="margin-top: 20px;">
+                    <form action="{% url 'toggle_follow' profile_user.username %}" method="POST" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-action {% if is_following %}btn-danger{% endif %}">
+                            {% if is_following %}إلغاء المتابعة ✖{% else %}متابعة الشيف 🌟{% endif %}
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <h3>وصفات</h3>
+                        <span>{{ recipe_count }}</span>
+                    </div>
+                    <div class="profile-stat">
+                        <h3>يتابع</h3>
+                        <span>{{ following_count }}</span>
+                    </div>
+                    <div class="profile-stat">
+                        <h3>يتابعه</h3>
+                        <span>{{ followers_count }}</span>
+                    </div>
+                    <div class="profile-stat">
+                        <h3>إعجابات</h3>
+                        <span>{{ total_likes_received }}</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-wrap:wrap; gap:15px; margin-top:25px;">
+                    <a href="{% url 'user_relations' profile_user.username %}?tab=followers" class="btn-action btn-outline">المتابِعون ({{ followers_count }})</a>
+                    <a href="{% url 'user_relations' profile_user.username %}?tab=following" class="btn-action btn-outline">أُتابع ({{ following_count }})</a>
+                    
+                    {% if is_own_profile %}
+                    <a href="{% url 'favorites' %}" class="btn-action" style="background:var(--secondary);">🔖 المحفوظات ({{ saved_recipes_count }})</a>
+                    <a href="{% url 'user_liked_recipes' %}" class="btn-action" style="background:#ef4444;">❤️ إعجاباتي ({{ liked_recipes_count }})</a>
+                    {% endif %}
+                </div>
+
+                <div style="margin-top: 25px; color: var(--text-dim);">
+                    <p style="margin-bottom: 5px;"><strong>البريد:</strong> {{ profile_user.email }}</p>
+                    {% if profile_user.phone_number %}
+                        <p style="margin-bottom: 5px;"><strong>الهاتف:</strong> {{ profile_user.phone_number }}</p>
+                    {% endif %}
+                </div>
+                
+
+
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin: 50px 0 30px;">
+            <div>
+                <h2 style="margin:0; font-size:2.2rem; color:var(--text-main); font-weight:900;">وصفات الطباخ</h2>
+                <p style="margin:8px 0 0; color:var(--text-dim); font-size:1.1rem;">أشهى الوصفات والإبداعات</p>
+            </div>
+            {% if is_own_profile %}
+            <a href="{% url 'recipe_add' %}" class="btn-action">✨ أضف وصفة جديدة</a>
+            {% endif %}
+        </div>
+
+        {% if recipes %}
+            <div class="recipes-grid">
+                {% for recipe in recipes %}
+                    <div class="recipe-card" style="position:relative;">
+                        <div class="card-img-wrap" onclick="window.location.href='{% url 'recipe_detail' recipe.id %}'">
+                            {% if recipe.image %}
+                                <img src="{{ recipe.image.url }}" class="card-img" alt="{{ recipe.title }}">
+                            {% else %}
+                                <div style="width:100%; height:100%; background:var(--bg-main); display:flex; align-items:center; justify-content:center; font-size:3rem;">🍲</div>
+                            {% endif %}
+                        </div>
+                        <div class="card-body" onclick="window.location.href='{% url 'recipe_detail' recipe.id %}'">
+                            <h3 class="card-title">{{ recipe.title }}</h3>
+                            <p class="card-desc">{{ recipe.description|truncatechars:100 }}</p>
+                        </div>
+
+                        {% if is_own_profile %}
+                        <div style="padding: 0 25px 25px; display:flex; gap:10px;">
+                            <a href="{% url 'edit_recipe' recipe.id %}" class="btn-action btn-outline" style="flex:1; margin:0; padding:10px; font-size:0.9rem;">✏️ تعديل</a>
+                            <a href="{% url 'delete_recipe' recipe.id %}" class="btn-action btn-danger" style="flex:1; margin:0; padding:10px; font-size:0.9rem;">🗑️ حذف</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3 style="font-weight:900;">لا توجد وصفات منشورة بعد 🍽️</h3>
+                <p style="color:var(--text-dim); font-size:1.1rem; margin-bottom: 25px;">يبدو أن هذا الحساب لم يقم بمشاركة أي وصفة حتى الآن.</p>
+                {% if is_own_profile %}
+                <a href="{% url 'recipe_add' %}" class="btn-action">كن أول من ينشر وصفة!</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

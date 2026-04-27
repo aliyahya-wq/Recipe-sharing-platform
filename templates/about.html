@@ -6,19 +6,19 @@
 <style>
     .about-page {
         font-family: 'Cairo', sans-serif;
-        background: #0f172a;
+        background: var(--bg-main);
         min-height: 100vh;
         direction: rtl;
-        color: #f8fafc;
+        color: var(--text-main);
     }
 
     /* ── HERO ── */
     .about-hero {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-main) 100%);
         padding: 100px 24px;
         text-align: center;
         position: relative;
-        border-bottom: 1px solid #334155;
+        border-bottom: 1px solid var(--border);
     }
     .about-hero h1 {
         font-size: clamp(2.5rem, 8vw, 4.5rem);
@@ -28,7 +28,7 @@
         margin-bottom: 20px;
     }
     .about-hero p {
-        color: #94a3b8;
+        color: var(--text-dim);
         font-size: 1.25rem;
         max-width: 800px;
         margin: 0 auto;
@@ -45,18 +45,18 @@
     }
 
     .info-card {
-        background: #1e293b;
-        border: 1px solid #334155;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
         border-radius: 40px;
         padding: 60px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        box-shadow: var(--shadow);
         margin-bottom: 40px;
     }
 
     .section-title {
         font-size: 2.2rem;
         font-weight: 900;
-        color: #fff;
+        color: var(--text-main);
         margin-bottom: 30px;
         display: flex;
         align-items: center;
@@ -71,7 +71,7 @@
 
     .large-description {
         font-size: 1.15rem;
-        color: #cbd5e1;
+        color: var(--text-dim);
         line-height: 2.1;
         text-align: justify;
     }
@@ -84,8 +84,8 @@
     }
 
     .feature-item {
-        background: #0f172a;
-        border: 1px solid #334155;
+        background: var(--bg-main);
+        border: 1px solid var(--border);
         padding: 40px;
         border-radius: 30px;
         transition: all 0.3s;
@@ -102,13 +102,13 @@
         display: block;
     }
     .feature-item h3 {
-        color: #fff;
+        color: var(--text-main);
         margin-bottom: 15px;
         font-weight: 800;
         font-size: 1.4rem;
     }
     .feature-item p {
-        color: #94a3b8;
+        color: var(--text-dim);
         font-size: 1rem;
         line-height: 1.7;
     }

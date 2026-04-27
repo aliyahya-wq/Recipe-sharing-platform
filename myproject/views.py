@@ -6,10 +6,13 @@ def home(request):
     # جلب آخر 6 وصفات تمت إضافتها
     recent_recipes = Recipe.objects.all().order_by('-created_at')[:6]
     
-    # جلب قائمة المفضلات للمستخدم الحالي (أو الزائر)
+    # جلب قائمة المفضلات والمتابعات للمستخدم الحالي
     favorite_ids = []
+    following_ids = []
     if request.user.is_authenticated:
         favorite_ids = list(Favorite.objects.filter(user=request.user).values_list('recipe_id', flat=True))
+        from recipes.models import Follow
+        following_ids = list(Follow.objects.filter(follower=request.user).values_list('following_id', flat=True))
     else:
         # تحويل القيم في الجلسة إلى أرقام (أو نصوص حسب طريقة التخزين) للتوافق
         guest_favs = request.session.get('guest_favorites', [])
@@ -26,7 +29,8 @@ def home(request):
         'recipes': recent_recipes, 
         'total_recipes_count': total_recipes,
         'category_count': all_categories.count(),
-        'all_categories': all_categories
+        'all_categories': all_categories,
+        'following_ids': following_ids
     })
 
 def recipes(request):

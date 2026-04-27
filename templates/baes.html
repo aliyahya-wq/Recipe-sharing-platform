@@ -20,7 +20,22 @@
             --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body.light-mode {
+            --bg-main: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-dim: #475569;
+            --border: #cbd5e1;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            --primary: #4f46e5;
+            --secondary: #0ea5e9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Cairo', sans-serif;
@@ -28,6 +43,13 @@
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
+            font-weight: 400;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 900;
+            line-height: 1.2;
+            color: var(--text-main);
         }
 
         /* ── NAVBAR ── */
@@ -76,7 +98,9 @@
             transition: all 0.2s;
         }
 
-        nav a:hover { color: var(--primary-hover); }
+        nav a:hover {
+            color: var(--primary-hover);
+        }
 
         .nav-btn {
             background: var(--primary);
@@ -101,7 +125,32 @@
             border-radius: 12px;
             font-size: 0.85rem;
         }
-        .logout-btn:hover { background: #ef4444; color: #fff !important; }
+
+        .logout-btn:hover {
+            background: #ef4444;
+            color: #fff !important;
+        }
+
+        .theme-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+
+        .theme-btn:hover {
+            border-color: var(--primary);
+            transform: rotate(15deg);
+        }
 
         .fav-link {
             color: #fbbf24 !important;
@@ -133,26 +182,49 @@
             width: 90%;
             max-width: 500px;
         }
+
         .alert {
             padding: 16px 24px;
             border-radius: 16px;
             margin-bottom: 15px;
             font-weight: 700;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             animation: slideInDown 0.5s ease-out;
         }
-        .alert-success { background: #10b981; color: #fff; }
-        .alert-error, .alert-danger { background: #ef4444; color: #fff; }
-        .alert-info { background: #3b82f6; color: #fff; }
+
+        .alert-success {
+            background: #10b981;
+            color: #fff;
+        }
+
+        .alert-error,
+        .alert-danger {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .alert-info {
+            background: #3b82f6;
+            color: #fff;
+        }
 
         @keyframes slideInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* ── CONTAINER ── */
-        .main-content { min-height: calc(100vh - 80px); }
+        .main-content {
+            min-height: calc(100vh - 80px);
+        }
 
         /* ── FOOTER ── */
         footer {
@@ -163,14 +235,28 @@
             color: var(--text-dim);
         }
 
-        @media (max-width: 768px) { nav ul { display: none; } }
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+        }
 
         /* ── GLOBAL ANIMATIONS ── */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .animate-up { animation: fadeInUp 0.6s ease-out forwards; }
+
+        .animate-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
     </style>
 </head>
 
@@ -184,17 +270,9 @@
         </div>
         {% endfor %}
     </div>
-    <script>
-        setTimeout(() => {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(a => {
-                a.style.transition = 'opacity 0.5s';
-                a.style.opacity = '0';
-                setTimeout(() => a.remove(), 500);
-            });
-        }, 3500);
-    </script>
     {% endif %}
+
+
 
     <header>
         <nav>
@@ -206,13 +284,20 @@
                 <li><a href="{% url 'contact' %}">تواصل بنا</a></li>
             </ul>
             <ul>
+                <li>
+                    <button id="theme-toggle" class="theme-btn" title="تبديل الوضع">
+                        <span id="theme-icon">🌙</span>
+                    </button>
+                </li>
                 {% if user.is_authenticated %}
-                    <span class="user-greet">مرحباً، {{ user.username }}</span>
-                    <li><a href="{% url 'favorites' %}" class="fav-link">⭐ المفضلات</a></li>
-                    <li><a href="{% url 'logout' %}" class="logout-btn">خروج</a></li>
+
+                <li><a href="{% url 'profile' %}" class="nav-btn">
+                    <span>مرحباً، {{ user.username}}</span>
+                </a></li>
+                <li><a href="{% url 'logout' %}" class="logout-btn">تسجيل خروج</a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}" class="login-link">دخول</a></li>
-                    <li><a href="{% url 'register' %}" class="nav-btn">حساب جديد</a></li>
+                <li><a href="{% url 'login' %}" class="login-link"> تسجيل دخول</a></li>
+                <li><a href="{% url 'register' %}" class="nav-btn">حساب جديد</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -225,6 +310,45 @@
     <footer>
         <p>&copy; 2026 PlatEeat - جميع الحقوق محفوظة. صُمم بكل شغف لمحبي الطبخ.</p>
     </footer>
+    <script>
+        // Dark Mode Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+
+        // Check for saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            body.classList.add('light-mode');
+            if (themeIcon) themeIcon.innerText = '☀️';
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('light-mode');
+                const isLight = body.classList.contains('light-mode');
+                
+                if (themeIcon) themeIcon.innerText = isLight ? '☀️' : '🌙';
+                localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                
+                // Optional: Animation effect
+                themeToggle.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    themeToggle.style.transform = 'scale(1)';
+                }, 100);
+            });
+        }
+
+        // Messages timeout
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(a => {
+                a.style.transition = 'opacity 0.5s';
+                a.style.opacity = '0';
+                setTimeout(() => a.remove(), 500);
+            });
+        }, 3500);
+    </script>
 </body>
 
 </html>
